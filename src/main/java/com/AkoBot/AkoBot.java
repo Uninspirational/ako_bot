@@ -12,11 +12,10 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.login.LoginException;
 
 public class AkoBot extends ListenerAdapter{
-//    private String resourcesDirectory = "./src/main/resources/";
+    //    private String resourcesDirectory = "./src/main/resources/";
     private CommandController commandReader= new CommandController();
     private static JDA akoBot;
-//    private Logger logger = new Logger(resourcesDirectory);
-        private final Logger logger = LoggerFactory.getLogger(AkoBot.class);
+    private final Logger logger = LoggerFactory.getLogger(AkoBot.class);
 
     /**
      * creat bot, connect, and add Event Listener
