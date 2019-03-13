@@ -38,10 +38,6 @@ public class AkoBot extends ListenerAdapter{
             TextChannel textChannel = messageReceivedEvent.getTextChannel();
             if (messageReceivedEvent.getAuthor().isBot())
                 return;
-//            if (messageReceivedEvent.getAuthor().getId().equals("93907357246951424")){
-//                textChannel.sendMessage("I don't talk to white people").queue();
-//                return;
-//            }
             if (messageReceivedEvent.getChannelType().equals(ChannelType.PRIVATE))
                 return;
             if (commandCheck(messageReceivedEvent)) {
