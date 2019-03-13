@@ -1,0 +1,17 @@
+package com.AkoBot.Bandori;
+
+public enum SongType {
+    GAME_VERSION,
+    ACOUSTIC,
+    INSTRUMENTAL,
+    ACOUSTIC_INSTRUMENTAL,
+    FULL_VERSION,
+    TV_SIZE,
+    LIVE,
+    ENCORE_LIVE,
+    POPIPA_ACOUSTIC,
+    REMASTER,
+    SOLO,
+    SHORT,
+    REMASTER_INSTRUMENTAL
+}
