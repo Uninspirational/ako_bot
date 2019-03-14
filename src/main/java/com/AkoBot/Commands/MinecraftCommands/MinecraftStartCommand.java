@@ -18,14 +18,15 @@ public class MinecraftStartCommand {
         try {
             String servername = messageReceivedEvent.getMessage().getContentRaw();
             servername = servername.substring(servername.indexOf(" ") + 1);
-            String batchFile = servername.concat(".bat");
 
-            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", batchFile);
-            File dir = new File("C:\\docs\\minecraft");
+            String batchFile = "./run.bat";
+            ProcessBuilder pb = new ProcessBuilder();
+            pb.command("sh", "-c", batchFile);
+            File dir = new File("/home/pi/minecraft_servers/" + servername);
             pb.directory(dir);
             pb.redirectErrorStream(true);
             Process minecraft = pb.start();
-            textChannel.sendMessage(member.getNickname() + " the minecraft server has successfully been started!").queue();
+            textChannel.sendMessage(member.getEffectiveName() + " the " + servername + " server has successfully been started!").queue();
             MinecraftServer minecraftServer = new MinecraftServer();
             minecraftServer.setOutputStream(minecraft.getOutputStream());
             minecraftServer.setProcess(minecraft);
