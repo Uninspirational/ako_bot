@@ -12,6 +12,7 @@ public class BandoriSong {
     private SongType songType;
     private String band;
     private String wiki;
+    private String thumbnail;
     public BandoriSong(String name, String url, AudioTrack audioTrack, int id, SongType songType) {
         this.name = name;
         this.url = url;
@@ -32,6 +33,14 @@ public class BandoriSong {
     }
     public BandoriSong(String name, String url, SongType songType) {
         this(name, url, null, -1, songType);
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
     }
 
     public void setBand(String band) { this.band = band; }
