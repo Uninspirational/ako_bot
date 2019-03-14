@@ -10,7 +10,6 @@ public class BandoriMemberCommand {
             bandoriMembers.controller(messageReceivedEvent);
         }
         catch (NullPointerException e) {
-            new Logger().logError(e);
         }
     }
 }
