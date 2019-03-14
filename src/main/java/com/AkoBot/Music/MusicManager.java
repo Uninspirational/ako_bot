@@ -129,7 +129,6 @@ public class MusicManager {
     public void loadTrack(final TextChannel textChannel, final String source, final Member member, final BandoriSong bandoriSong){
         final Guild guild = textChannel.getGuild();
         final MusicController player = getPlayer(guild);
-        System.out.println(source);
         try {
             URL test = new URL(source);
         }
@@ -139,7 +138,6 @@ public class MusicManager {
                 searchVideo(textChannel, source, member);
                 return;
             }
-            System.out.println(bandoriSong.getUrl());
         }
         manager.loadItemOrdered(player, source, new AudioLoadResultHandler(){
             /**
