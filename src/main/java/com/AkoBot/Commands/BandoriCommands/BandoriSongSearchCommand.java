@@ -46,9 +46,14 @@ public class BandoriSongSearchCommand {
             //if one song was found
             if (hits.size() == 1) {
                 BandoriCollection result = collection.get(hits.get(0));
+                try {
+                    embedBuilder.setThumbnail(result.getThumbNail());
+                }
+                catch (IllegalArgumentException z) {
+                    embedBuilder.setThumbnail("https://vignette.wikia.nocookie.net/bandori/images/8/84/Ako_PICO_Icon.png/revision/latest?cb=20180715113757");
+                }
                 embedBuilder
                         .setTitle(result.getName(), result.getWikiUrl())
-                        .setThumbnail(result.getThumbNail())
                         .setColor(new Color(0xBA00BA))
                         .setAuthor(result.getBand())
                         .addField("Description", result.getDescription(), false);
