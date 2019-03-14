@@ -6,13 +6,13 @@ import java.util.LinkedList;
 public class BandoriCollection {
     private LinkedList<BandoriSong> bandoriSongs;
     private String name;
-    private String[] band;
+    private BandType[] band;
     private String wikiUrl;
     private int length = 0;
     private String thumbNail;
     private String key;
     private String description;
-    public BandoriCollection(String name, String wikiUrl, String description, String[] band, String thumbNail, String key) {
+    public BandoriCollection(String name, String wikiUrl, String description, BandType[] band, String thumbNail, String key) {
         this.name = name;
         this.wikiUrl = wikiUrl;
         this.bandoriSongs = new LinkedList<>();
@@ -21,6 +21,7 @@ public class BandoriCollection {
         this.description = description;
         this.band = band;
     }
+    public BandoriSong getFirstSong() { return this.bandoriSongs.get(0); }
 
     public void setName(String name) {
         this.name = name;
@@ -42,7 +43,7 @@ public class BandoriCollection {
         return this.description;
     }
 
-    public void setBand(String[] band) {
+    public void setBand(BandType[] band) {
         this.band = band;
     }
 
@@ -121,10 +122,11 @@ public class BandoriCollection {
     public String getBand() {
         int i = 0;
         String result = "";
+        BandoriTypes bandoriTypes = new BandoriTypes();
         while (this.band != null && this.band[i] != null) {
             if (i != 0)
                 result = result.concat(", ");
-            result = result.concat(this.band[i++]);
+            result = result.concat(bandoriTypes.getBandString(this.band[i++]));
         }
         return result;
     }
