@@ -10,6 +10,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 public class AudioListener extends AudioEventAdapter {
     private final BlockingQueue<Song> tracks;
     private final AudioPlayer audioPlayer;
+    private Song playing;
     /**
      * initializes the audio player
      *
@@ -17,7 +18,7 @@ public class AudioListener extends AudioEventAdapter {
      */
     public AudioListener(AudioPlayer audioPlayer) {
         this.audioPlayer = audioPlayer;
-        this.tracks = new LinkedBlockingQueue<Song>();
+        this.tracks = new LinkedBlockingQueue<>();
     }
     /**
      * returns songs in queue
@@ -41,17 +42,14 @@ public class AudioListener extends AudioEventAdapter {
      * @param song song to add
      */
     public void addTrack(Song song) {
-        System.out.println("addTrack ran");
         tracks.add(song);
         if (audioPlayer.getPlayingTrack() == null) {
-            System.out.println("track is not empty");
             if (song.getBandoriSong() != null) {
                 audioPlayer.startTrack(song.getBandoriSong().getAudioTrack(), false);
-                System.out.println("Playing bandori song");
             }
             else {
+                playing = song;
                 audioPlayer.startTrack(song.getAudioTrack(), false);
-                System.out.println("Playing non-bandori song");
             }
         }
 
@@ -69,16 +67,15 @@ public class AudioListener extends AudioEventAdapter {
      * play the next song
      */
     public void playNextTrack() throws NullPointerException{
-        System.out.println("playNextTrack ran");
         tracks.poll();
         try
         {
-            System.out.println(tracks.peek().getAudioTrack().getInfo().title);
+            playing = tracks.peek();
             getAudioPlayer().startTrack((tracks.peek().getAudioTrack()), false);
-            System.out.println(getAudioPlayer().getPlayingTrack().getInfo().title);
         }
         catch (NullPointerException e)
         {
+            playing = null;
             getAudioPlayer().destroy();
 //            getAudioPlayer().getPlayingTrack().stop();
         }
@@ -92,8 +89,7 @@ public class AudioListener extends AudioEventAdapter {
      */
     @Override
     public void onTrackStart(AudioPlayer audioPlayer, AudioTrack audioTrack) {
-        System.out.println(audioPlayer.getPlayingTrack().getInfo().title);
-        System.out.println("onTrackStart ran");
+        playing = tracks.peek();
     }
 
     /**
@@ -101,7 +97,8 @@ public class AudioListener extends AudioEventAdapter {
      * @return song playing now
      */
     public Song currentlyPlaying() {
-        return new Song(audioPlayer.getPlayingTrack(), tracks.peek().getMember(), tracks.peek().getBandoriSong());
+        return playing;
+//        return new Song(audioPlayer.getPlayingTrack(), tracks.peek().getMember(), tracks.peek().getBandoriSong());
     }
     /**
      * handles what to do after a song ends
@@ -112,7 +109,6 @@ public class AudioListener extends AudioEventAdapter {
      */
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        System.out.println("ontrackend ran");
         if (endReason.mayStartNext) {
             playNextTrack();
         }
