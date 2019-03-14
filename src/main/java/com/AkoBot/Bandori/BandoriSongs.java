@@ -52,7 +52,6 @@ public class BandoriSongs {
                         if (allimages.get(i).getAsJsonObject().getAsJsonPrimitive("mediatype").getAsString().equals("AUDIO")) {
                             url = allimages.get(i).getAsJsonObject().getAsJsonPrimitive("url").getAsString();
                             name = allimages.get(i).getAsJsonObject().getAsJsonPrimitive("title").getAsString();
-                            System.out.println("name: " + name);
                             collection.add(getBandoriSong(name, url));
                         }
                     }
@@ -357,6 +356,9 @@ public class BandoriSongs {
         else if (name.contains("STAR BEAT ")) {
             name = name.replace("STAR BEAT ", "STAR BEAT! ");
         }
+        else if (name.contains("Hanazono Electric Guitar!!!")) {
+            name = name.replace("Hanazono Electric Guitar!!!", "Hanazono Denki Guitar!!!");
+        }
         return name;
     }
     /**
@@ -396,8 +398,10 @@ public class BandoriSongs {
      */
     private BandoriSong[] insertionSort() {
         int i, j, length = collection.size();
-        if (length == 0)
+        if (length == 0) {
             logger.debug("collection is empty could not sort bandorisongs");
+            throw new NullPointerException("empty collection in insertsort bandoriSongs");
+        }
         BandoriSong[] songs = new BandoriSong[length];
         BandoriSong pos;
 
@@ -424,36 +428,52 @@ public class BandoriSongs {
      * @param description song description from getDescription()
      * @return array of band names
      */
-    private String[] bandNames(String description) {
+    private BandType[] bandNames(String description) {
         int i = 0;
-        String[] names = new String[7];
-        description = description.toLowerCase();
+        BandType[] bandTypes = new BandType[15];
+        description = description.toLowerCase().substring(0, description.indexOf(". "));
+        if (description.contains("god knows"))
+            bandTypes[i++] = BandType.POPIPA;
+        if (description.contains("tsunagu, soramoyou"))
+            bandTypes[i++] = BandType.AFTERGLOW;
+        if (description.contains("high school part time workers")) {
+            bandTypes[i++] = BandType.HSPTW;
+        }
         if (description.contains("roselia")) {
-            names[i++] = "Roselia";
+            bandTypes[i++] = BandType.ROSELIA;
         }
         if (description.contains("poppin")) {
-            names[i++] = "Poppin'Party";
+            bandTypes[i++] = BandType.POPIPA;
         }
         if (description.contains("afterglow")) {
-            names[i++] = "afterglow";
+            bandTypes[i++] = BandType.AFTERGLOW;
         }
         if (description.contains("pastel")) {
-            names[i++] = "Pastel☆Palettes";
+            bandTypes[i++] = BandType.PASUPARE;
         }
         if (description.contains("hello, happy world")) {
-            names[i++] = "Hello, Happy World";
+            bandTypes[i++] = BandType.HELLOHAPPY;
         }
         if (description.contains("glitter")) {
-            names[i++] = "Glitter☆Green";
+            bandTypes[i++] = BandType.GURIGURI;
         }
         if (description.contains("raise a suilen")) {
-            names[i++] = "RAISE A SUILEN";
+            bandTypes[i++] = BandType.RAS;
+        }
+        if (description.contains("gfriend")) {
+            bandTypes[i++] = BandType.GFRIEND;
+        }
+        if (description.contains("chispa")) {
+            bandTypes[i++] = BandType.CHISPA;
+        }
+        if (description.contains("character song") && !description.contains("god knows...")) {
+            bandTypes[i++] = BandType.CHARACTERSONG;
         }
         if (description.contains("argonavis")) {
-            names[i] = "Argonavis";
+            bandTypes[i] = BandType.ARGONAVIS;
         }
 
-        return names;
+        return bandTypes;
     }
 
     /**
@@ -464,7 +484,7 @@ public class BandoriSongs {
         int length = array.length;
         int i, id;
         String name, wikiUrl, thumbnail, key, hashName, description;
-        String[] bands;
+        BandType[] bands;
         BandoriSong song;
         try {
             //first run through to create collections for all game version songs
@@ -486,6 +506,7 @@ public class BandoriSongs {
                     BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail, key);
                     song.setBand(collection.getBand());
                     song.setWiki(wikiUrl);
+                    song.setThumbnail(thumbnail);
                     collection.addSong(song);
                     this.hashtable.put(key, collection);
                     this.keys.add(key);
@@ -504,6 +525,7 @@ public class BandoriSongs {
                         song = array[i];
                         song.setBand(hashtable.get(key).getBand());
                         song.setWiki(hashtable.get(key).getWikiUrl());
+                        song.setThumbnail(hashtable.get(key).getThumbNail());
                         hashtable.get(key).addSong(song);
                     }
                     //if the song does not have a game version
@@ -524,6 +546,7 @@ public class BandoriSongs {
                         BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail, key);
                         song.setBand(collection.getBand());
                         song.setWiki(wikiUrl);
+                        song.setThumbnail(thumbnail);
                         collection.addSong(song);
                         hashtable.put(key, collection);
                         this.keys.add(key);
