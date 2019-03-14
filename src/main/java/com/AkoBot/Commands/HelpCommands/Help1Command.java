@@ -25,7 +25,7 @@ public class Help1Command {
                                         "**$skip** - play the next song\n" +
                                         "**$clear** - empty the queue *note does not skip the current song*\n" +
                                         "**$queue** - display the queue *note duration does not work for BanG Dream songs*\n" +
-                                        "**$np** - display the current playing song *note - duration does not work for BanG Dream songs*\n",
+                                        "**$np** - display the current playing song *note - song duration does not work for BanG Dream songs*\n",
                                 false);
         MessageBuilder messageBuilder = new MessageBuilder()
                 .setEmbed(embedBuilder.build());
