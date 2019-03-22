@@ -139,7 +139,6 @@ public class BandoriCards {
         int j = 0;
         try {
             for (BandoriCard bandoriCard : bandoriCards) {
-                System.out.println(bandoriCard.getName());
                 if (bandoriCard.search(category, keyterm)) {
                     result.add(bandoriCard);
                     if (j++ == 24)

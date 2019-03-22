@@ -7,9 +7,6 @@ can search https://bandori.party/ api for cards and members
 can play audio files hosted on webservices (i.e. https://mixtape.moe/)
 
 Future:
-upload audio files to mixtape.moe and return the url
-create and store playlists using such urls
-allow shuffling of multiple bands' songs into queue
 implement more commands
 fix known bugs
 
@@ -23,11 +20,18 @@ GSON
 https://github.com/google/gson
 
 Known bugs
-sometimes fails to load a song from a youtube search, but works after the 2nd or 3rd try
-sometimes fails to play next song in queue(should be fixed)
 
 **new**
-playing from youtube link broke, oops
+1.1.0
+bug fixes in card and member searching
+new help command
+
+1.0.1
+fixed youtube links not playing
+
+1.0.0
+Large scale changes to organization of commands
+added local minecraft server control
 
 0.8.5
 updated responses to be more characteristic of Ako

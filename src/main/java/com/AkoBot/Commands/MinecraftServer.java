@@ -37,7 +37,7 @@ public class MinecraftServer {
     }
     public boolean closeMinecraftServer() {
         try {
-            PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(outputStream));
+            PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(getOutputStream()));
             printWriter.println("/stop");
             printWriter.flush();
             printWriter.close();

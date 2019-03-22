@@ -139,9 +139,7 @@ public class BandoriMembers {
         }
     }
     public void cardPrinter(TextChannel textChannel, BandoriMember bandoriMember) {
-        System.out.println(bandoriMember.getName());
         EmbedBuilder embedBuilder = bandoriMember.getEmbedMessage();
-        System.out.println(bandoriMember.getName());
         MessageBuilder messageBuilder = new MessageBuilder()
                 .setEmbed(embedBuilder.build());
         textChannel.sendMessage(messageBuilder.build()).queue();

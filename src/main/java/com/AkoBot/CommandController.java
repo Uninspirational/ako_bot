@@ -12,13 +12,11 @@ import com.AkoBot.Commands.MinecraftCommands.MinecraftInfoCommand;
 import com.AkoBot.Commands.MinecraftCommands.MinecraftStartCommand;
 import com.AkoBot.Commands.MusicCommands.*;
 import com.AkoBot.Music.*;
-import com.AkoBot.Playlist.*;
 
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 
 public class CommandController {
 	private BandoriSongs bandoriSongs = null;
@@ -148,18 +146,13 @@ public class CommandController {
 				new BandoriMemberCommand().member(messageReceivedEvent, bandoriMembers);
 				break;
 			case "$startminecraft":
-				if (minecraftServer.isRunning()) {
-					textChannel.sendMessage("A server is already running!").queue();
-				}
-				else {
-					minecraftServer = new MinecraftStartCommand().startMineCraft(messageReceivedEvent);
-				}
+				minecraftServer = new MinecraftStartCommand().startMineCraft(messageReceivedEvent, minecraftServer);
 				break;
 			case "$infominecraft":
 				new MinecraftInfoCommand().listServers(messageReceivedEvent, minecraftServer);
+				break;
 			case "$endminecraft":
-				if (new MinecraftEndCommand().EndMinecraft(messageReceivedEvent, minecraftServer))
-					minecraftServer = null;
+				minecraftServer = new MinecraftEndCommand().EndMinecraft(messageReceivedEvent, minecraftServer);
 				break;
 			default:
 				incorrectCommandResponse(textChannel);

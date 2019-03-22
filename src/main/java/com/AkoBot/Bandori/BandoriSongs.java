@@ -16,7 +16,6 @@ public class BandoriSongs {
 
     private Hashtable<String, BandoriCollection> hashtable = new Hashtable<>(500);
     private ArrayList<String> keys = new ArrayList<>();
-    private ArrayList<BandoriSong> collection;
 
     public void BandoriRefresh() {
         try {
@@ -27,6 +26,7 @@ public class BandoriSongs {
 //            aisort by name in ascending order
 //            display url and mediatype
 
+            ArrayList<BandoriSong> collection;
             String urlString = "https://bandori.fandom.com/api.php?action=query&format=json&list=allimages&indexpageids=1&rawcontinue=1&aisort=name&aidir=descending&aiprop=url%7Csize%7Cmediatype&aiminsize=1000000&ailimit=max";
             collection = new ArrayList<>();
             JsonArray allimages;
@@ -48,13 +48,18 @@ public class BandoriSongs {
                 try {
                     next = rootobj.getAsJsonObject("query-continue").getAsJsonObject("allimages");
                     //only add audio files to arraylist
+                    System.out.println("---------------------------------");
+                    System.out.println("Loading Bandori Songs From API");
                     for (i = 0; i < allimages.size(); i++) {
                         if (allimages.get(i).getAsJsonObject().getAsJsonPrimitive("mediatype").getAsString().equals("AUDIO")) {
                             url = allimages.get(i).getAsJsonObject().getAsJsonPrimitive("url").getAsString();
                             name = allimages.get(i).getAsJsonObject().getAsJsonPrimitive("title").getAsString();
+
+                            System.out.println(name);
                             collection.add(getBandoriSong(name, url));
                         }
                     }
+                    System.out.println("---------------------------------");
 
                     //stop at last song
 
@@ -71,10 +76,15 @@ public class BandoriSongs {
                 }
             } while (flag);
             //sort songs by alphabetical order and return as array
-            BandoriSong[] songs = insertionSort();
-
+            System.out.println("---------------------------------");
+            System.out.println("Sorting Bandori Songs");
+            BandoriSong[] songs = insertionSort(collection);
+            System.out.println("---------------------------------");
             //put songs in hashmap of collection objects
+            System.out.println("---------------------------------");
+            System.out.println("Storing Bandori Songs");
             hashCollection(songs);
+            System.out.println("---------------------------------");
         }
         catch (MalformedURLException e) {
             logger.debug("Malformed URL Exception: {}", e);
@@ -396,7 +406,7 @@ public class BandoriSongs {
      * insert sort all the bandori songs
      * @return returns songs as an array
      */
-    private BandoriSong[] insertionSort() {
+    private BandoriSong[] insertionSort(ArrayList<BandoriSong> collection) {
         int i, j, length = collection.size();
         if (length == 0) {
             logger.debug("collection is empty could not sort bandorisongs");
@@ -489,6 +499,7 @@ public class BandoriSongs {
         try {
             //first run through to create collections for all game version songs
             for (i = 0; i < length; i++) {
+                System.out.println(array[i].getName());
                 if (array[i].getSongType().equals(SongType.GAME_VERSION)) {
                     song = array[i];
                     //strip names of uniqueness to turn into hash code
@@ -556,7 +567,7 @@ public class BandoriSongs {
             }
         }
         catch (IOException e) {
-            logger.debug("" + e);
+            logger.debug("Could not store bandori songs {}" + e);
         }
     }
 
@@ -698,14 +709,6 @@ public class BandoriSongs {
      */
     public Hashtable<String, BandoriCollection> getHashTable() {
         return hashtable;
-    }
-
-    /**
-     *
-     * @return arraylist of bandori songs
-     */
-    public ArrayList<BandoriSong> getCollection() {
-        return collection;
     }
 
     /**
