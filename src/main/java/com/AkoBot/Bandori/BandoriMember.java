@@ -73,4 +73,55 @@ public class BandoriMember {
     private String cutter(JsonElement jsonElement) {
         return jsonElement.toString().substring(1, jsonElement.toString().length() - 1);
     }
+
+    public int getBandInt() {
+        BandoriTypes types = new BandoriTypes();
+        if (types.getBandType(this.i_band).equals(BandType.AFTERGLOW)) {
+            return 0;
+        }
+        else if (types.getBandType(this.i_band).equals(BandType.HELLOHAPPY)) {
+            return 1;
+        }
+        else if (types.getBandType(this.i_band).equals(BandType.PASUPARE)) {
+            return 2;
+        }
+        else if (types.getBandType(this.i_band).equals(BandType.POPIPA)) {
+            return 3;
+        }
+        else if (types.getBandType(this.i_band).equals(BandType.RAS)) {
+            return 4;
+        }
+        else if (types.getBandType(this.i_band).equals(BandType.ROSELIA)) {
+            return 5;
+        }
+        else return -1;
+    }
+
+    public int getId() {
+        return id;
+    }
+    public int getInstrumentInt() {
+        if (this.instrument.equals("Bass")) {
+            return 0;
+        }
+        else if (this.instrument.equals("DJ")) {
+            return 1;
+        }
+        else if (this.instrument.equals("Drums")) {
+            return 2;
+        }
+        else if (this.instrument.equals("Guitar")) {
+            return 3;
+        }
+        else if (this.instrument.equals("Guitar & Vocals")) {
+            return 4;
+        }
+        else if (this.instrument.equals("Keyboard")) {
+            return 5;
+        }
+        else if (this.instrument.equals("Vocals")) {
+            return 6;
+        }
+        return -1;
+    }
 }

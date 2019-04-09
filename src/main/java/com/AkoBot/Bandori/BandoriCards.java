@@ -40,6 +40,9 @@ public class BandoriCards {
                 case "name":
                     searchForCard(textChannel, keyterm, trained, bandoriMembers, "name");
                     break;
+                case "id":
+                    searchForCard(textChannel, keyterm, trained, bandoriMembers, "id");
+                    break;
                 case "membername":
                     searchForCard(textChannel, keyterm, trained, bandoriMembers, "membername");
                     break;
@@ -177,4 +180,7 @@ public class BandoriCards {
         textChannel.sendMessage(messageBuilder.build()).queue();
     }
 
+    public ArrayList<BandoriCard> getBandoriCards() {
+        return bandoriCards;
+    }
 }

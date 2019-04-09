@@ -168,4 +168,12 @@ public class BandoriMembers {
     public String searchById(int id) {
         return bandoriMembers.get(id - 6).getName();
     }
+    public BandoriMember getMemberById(int id) {
+        for (BandoriMember bandoriMember : this.bandoriMembers) {
+            if (bandoriMember.getId() == id) {
+                return bandoriMember;
+            }
+        }
+        return null;
+    }
 }

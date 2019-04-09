@@ -3,6 +3,8 @@ package com.AkoBot;
 import com.AkoBot.Bandori.*;
 import com.AkoBot.Commands.*;
 import com.AkoBot.Commands.BandoriCommands.*;
+import com.AkoBot.Commands.BandoriGameCommands.BandoriGachaCommand;
+import com.AkoBot.Commands.BandoriGameCommands.BandoriGameCommand;
 import com.AkoBot.Commands.HelpCommands.Help1Command;
 import com.AkoBot.Commands.HelpCommands.Help2Command;
 import com.AkoBot.Commands.HelpCommands.Help3Command;
@@ -13,6 +15,7 @@ import com.AkoBot.Commands.MinecraftCommands.MinecraftStartCommand;
 import com.AkoBot.Commands.MusicCommands.*;
 import com.AkoBot.Music.*;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.slf4j.LoggerFactory;
@@ -25,17 +28,19 @@ public class CommandController {
 	private MusicManager musicManager = new MusicManager();
 	private BandoriMembers bandoriMembers = null;
 	private MinecraftServer minecraftServer = new MinecraftServer();
+	private Profiles profiles = new Profiles();
+	private EventWaiter waiter;
 	/**
 	 * handles commands
 	 *
 	 * @param messageReceivedEvent MessageReceivedEvent
 	 */
-	public void commandController(MessageReceivedEvent messageReceivedEvent) {
-
+	public void commandController(MessageReceivedEvent messageReceivedEvent, EventWaiter waiter) {
 		//get textchannel message was sent from and the appropriate command
 		TextChannel textChannel = messageReceivedEvent.getTextChannel();
 		String tag;
 		String[] words;
+		this.waiter = waiter;
 		//try to just get the command phrase
 		try {
 			tag = messageReceivedEvent.getMessage().getContentStripped();
@@ -154,15 +159,21 @@ public class CommandController {
 			case "$endminecraft":
 				minecraftServer = new MinecraftEndCommand().EndMinecraft(messageReceivedEvent, minecraftServer);
 				break;
+			case "$gacha":
+				new BandoriGachaCommand(bandoriCards.getBandoriCards()).rollGacha(messageReceivedEvent, retrieveProfile(messageReceivedEvent));
+				break;
+			case "$test":
+				new BandoriGameCommand(messageReceivedEvent, waiter, profiles);
+				break;
 			default:
 				incorrectCommandResponse(textChannel);
 		}
 	}
 	public void shutDownMusic() {
 		new MusicShutdownCommand().shutDownMusic(musicManager);
+		profiles.saveAll();
 	}
-	/**
-	 * shuffles songs by a certain band
-	 * @param messageReceivedEvent messageReceivedEvent
-	 */
+	private Profile retrieveProfile(MessageReceivedEvent messageReceivedEvent) {
+		return profiles.getProfile(messageReceivedEvent.getAuthor().getId());
+	}
 }

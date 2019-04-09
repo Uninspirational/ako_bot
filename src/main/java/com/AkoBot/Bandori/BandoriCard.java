@@ -9,6 +9,7 @@ import java.awt.*;
 public class BandoriCard {
     private JsonObject jsonObject;
     private int member;
+    private BandoriMember bandoriMember;
     private int id;
     private String name;
     private String cameo_members;
@@ -40,10 +41,15 @@ public class BandoriCard {
     private int visual_min;
     private int visual_max;
     private int visual_trained_max;
+    private int xp;
+    private int level;
     public BandoriCard(JsonObject jsonObject, BandoriMembers bandoriMembers) {
+        this.xp = 0;
+        this.level = 1;
         this.jsonObject = jsonObject.getAsJsonObject();
         this.member = jsonObject.get("member").getAsInt();
         this.id = jsonObject.get("id").getAsInt();
+        this.bandoriMember = bandoriMembers.getMemberById(this.id);
         this.name = cutter(jsonObject.get("name"));
         this.cameo_members = cutter(jsonObject.get("cameo_members"));
         this.i_attribute = cutter(jsonObject.get("i_attribute"));
@@ -154,6 +160,80 @@ public class BandoriCard {
     public String getName() {
         return name;
     }
+
+    public String getSmall_image() {
+        return small_image;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getI_rarity() {
+        return i_rarity;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
+    }
+
+    public int getMember() {
+        return member;
+    }
+
+    public String getI_skill_type() {
+        return i_skill_type;
+    }
+
+    public String getI_attribute() {
+        return i_attribute;
+    }
+
+    public int getAttributeInt() {
+        if (i_attribute.equals("Cool")) {
+            return 0;
+        }
+        else if (i_attribute.equals("Happy")) {
+            return 1;
+        }
+        else if (i_attribute.equals("Power")) {
+            return 2;
+        }
+        else if (i_attribute.equals("Pure")) {
+            return 3;
+        }
+        else return -1;
+    }
+
+    public BandoriMember getBandoriMember() {
+        return bandoriMember;
+    }
+
+    public boolean addXp(int xp) {
+        this.xp += xp;
+        if (this.xp >= level * 100) {
+            this.xp -= level * 100;
+            xp += 1;
+            if (this.xp >= level * 100) {
+                return addXp(0);
+            }
+            else return false;
+        }
+        return false;
+    }
+
 
     private String cutter(JsonElement jsonElement) {
         return jsonElement.toString() != null ? jsonElement.toString().substring(1, jsonElement.toString().length() - 1) : null;
