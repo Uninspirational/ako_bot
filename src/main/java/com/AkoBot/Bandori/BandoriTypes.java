@@ -286,13 +286,13 @@ public class BandoriTypes {
     public int getAttributeColor(String attribute) {
         switch (attribute) {
             case "Pure":
-                return 0x3ECC24;
+                return 0x00E100;
             case "Happy":
-                return 0xFF8302;
+                return 0xFF8A00;
             case "Cool":
-                return 0xF72C53;
-            case "Powerful":
-                return 0x3E5BD3;
+                return 0x1E1EFF;
+            case "Power":
+                return 0xFF5A82;
             default:
                 return 0x000000;
         }
