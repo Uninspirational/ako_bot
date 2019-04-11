@@ -12,7 +12,7 @@ public class AudioHandler implements AudioSendHandler{
      *
      * @param audioPlayer audioPlayer to be created
      */
-    public AudioHandler(AudioPlayer audioPlayer) {
+    AudioHandler(AudioPlayer audioPlayer) {
         this.audioPlayer = audioPlayer;
     }
 

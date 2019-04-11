@@ -1,6 +1,5 @@
 package com.AkoBot.Bandori;
 
-import com.AkoBot.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,15 +14,13 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
 public class BandoriCards {
     private ArrayList<BandoriCard> bandoriCards;
-    final org.slf4j.Logger logger = LoggerFactory.getLogger(BandoriCards.class);
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(BandoriCards.class);
 
     public void controller(MessageReceivedEvent messageReceivedEvent, BandoriMembers bandoriMembers) {
         TextChannel textChannel = messageReceivedEvent.getTextChannel();
@@ -137,6 +134,7 @@ public class BandoriCards {
                 .setEmbed(embedBuilder.build());
         textChannel.sendMessage(messageBuilder.build()).queue();
     }
+    @SuppressWarnings("EmptyCatchBlock")
     private void searchForCard(TextChannel textChannel, String keyterm, boolean trained, BandoriMembers bandoriMembers, String category) {
         ArrayList<BandoriCard> result = new ArrayList<>();
         int j = 0;
@@ -182,5 +180,13 @@ public class BandoriCards {
 
     public ArrayList<BandoriCard> getBandoriCards() {
         return bandoriCards;
+    }
+    public BandoriCard searchSingleCard(int id) {
+        for (BandoriCard card : this.getBandoriCards()) {
+            if (card.getId() == id) {
+                return card;
+            }
+        }
+        return null;
     }
 }

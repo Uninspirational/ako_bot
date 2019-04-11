@@ -1,16 +1,10 @@
 package com.AkoBot.Commands.MinecraftCommands;
 
 import com.AkoBot.Commands.MinecraftServer;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.slf4j.LoggerFactory;
-
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.util.concurrent.TimeUnit;
 
 public class MinecraftEndCommand {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(MinecraftEndCommand.class);

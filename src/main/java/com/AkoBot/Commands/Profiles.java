@@ -15,6 +15,7 @@ public class Profiles {
         }
         return new Profile(id);
     }
+
     public void addProfile(Profile profile) {
         this.profiles.add(profile);
     }

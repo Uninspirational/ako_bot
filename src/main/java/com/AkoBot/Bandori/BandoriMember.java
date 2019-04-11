@@ -22,7 +22,7 @@ public class BandoriMember {
     private String instrument;
     private String description;
     private JsonObject jsonObject;
-    public BandoriMember(JsonObject jsonObject) {
+    BandoriMember(JsonObject jsonObject) {
         jsonObject = jsonObject.getAsJsonObject();
         this.jsonObject = jsonObject;
         this.id = jsonObject.get("id").getAsInt();
@@ -53,7 +53,7 @@ public class BandoriMember {
         return name;
     }
 
-    public EmbedBuilder getEmbedMessage() {
+    EmbedBuilder getEmbedMessage() {
         BandoriTypes bandoriTypes = new BandoriTypes();
         return new EmbedBuilder()
                         .setTitle("Member ID: " + this.id + " **" + this.name + "**" + "\n" + this.japanese_name)
@@ -73,7 +73,7 @@ public class BandoriMember {
     private String cutter(JsonElement jsonElement) {
         return jsonElement.toString().substring(1, jsonElement.toString().length() - 1);
     }
-
+    @SuppressWarnings("unused")
     public int getBandInt() {
         BandoriTypes types = new BandoriTypes();
         if (types.getBandType(this.i_band).equals(BandType.AFTERGLOW)) {
@@ -101,27 +101,26 @@ public class BandoriMember {
         return id;
     }
     public int getInstrumentInt() {
-        if (this.instrument.equals("Bass")) {
-            return 0;
-        }
-        else if (this.instrument.equals("DJ")) {
-            return 1;
-        }
-        else if (this.instrument.equals("Drums")) {
-            return 2;
-        }
-        else if (this.instrument.equals("Guitar")) {
-            return 3;
-        }
-        else if (this.instrument.equals("Guitar & Vocals")) {
-            return 4;
-        }
-        else if (this.instrument.equals("Keyboard")) {
-            return 5;
-        }
-        else if (this.instrument.equals("Vocals")) {
-            return 6;
+        switch (this.instrument) {
+            case "Bass":
+                return 0;
+            case "DJ":
+                return 1;
+            case "Drums":
+                return 2;
+            case "Guitar":
+                return 3;
+            case "Guitar & Vocals":
+                return 4;
+            case "Keyboard":
+                return 5;
+            case "Vocals":
+                return 6;
         }
         return -1;
+    }
+
+    public String getI_band() {
+        return i_band;
     }
 }

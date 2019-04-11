@@ -12,17 +12,15 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class BandoriGachaCommand {
-    ArrayList<BandoriCard> fourStars;
-    ArrayList<BandoriCard> threeStars;
-    ArrayList<BandoriCard> twoStars;
-    ArrayList<BandoriCard> oneStars;
+    private ArrayList<BandoriCard> fourStars;
+    private ArrayList<BandoriCard> threeStars;
+    private ArrayList<BandoriCard> twoStars;
+    private ArrayList<BandoriCard> oneStars;
     public BandoriGachaCommand(ArrayList<BandoriCard> allCards) {
         this.fourStars = new ArrayList<>();
         this.threeStars = new ArrayList<>();
@@ -43,7 +41,7 @@ public class BandoriGachaCommand {
             }
         }
     }
-    public int rollNumber(boolean guaranteed) {
+    private int rollNumber(boolean guaranteed) {
         //3, 8.5, 88.5
         Random r = new Random();
         r.setSeed(System.currentTimeMillis());
@@ -64,7 +62,7 @@ public class BandoriGachaCommand {
             return 2;
         }
     }
-    public Profile rollGacha(MessageReceivedEvent messageReceivedEvent, Profile profile) {
+    public void rollGacha(MessageReceivedEvent messageReceivedEvent, Profile profile) {
         try {
             BandoriCard bandoriCard;
             String tempFP = "./src/main/resources/GachaTemp.png", templateFP = "./src/main/resources/GachaTemplate.png";
@@ -74,7 +72,6 @@ public class BandoriGachaCommand {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
             boolean guaranteed = true;
-            BandoriCard bandoriCard1;
             BufferedImage bufferedImage;
             int roll;
             String four = "", three = "", two = "";
@@ -84,6 +81,7 @@ public class BandoriGachaCommand {
                 if (roll >= 3)
                     guaranteed = false;
                 bandoriCard = getGachaCard(roll);
+                assert bandoriCard != null;
                 bufferedImage = getGachaImage(bandoriCard);
                 profile.addCards(bandoriCard);
                 if (roll == 4)
@@ -110,11 +108,9 @@ public class BandoriGachaCommand {
             textChannel.sendFile(new File(tempFP), messageBuilder.build()).queue();
 
 
-            return profile;
         }
         catch (IOException e) {
             e.printStackTrace();
-            return profile;
         }
     }
     private BandoriCard getGachaCard(int rarity) {

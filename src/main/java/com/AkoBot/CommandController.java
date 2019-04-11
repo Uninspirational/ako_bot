@@ -5,10 +5,7 @@ import com.AkoBot.Commands.*;
 import com.AkoBot.Commands.BandoriCommands.*;
 import com.AkoBot.Commands.BandoriGameCommands.BandoriGachaCommand;
 import com.AkoBot.Commands.BandoriGameCommands.BandoriGameCommand;
-import com.AkoBot.Commands.HelpCommands.Help1Command;
-import com.AkoBot.Commands.HelpCommands.Help2Command;
-import com.AkoBot.Commands.HelpCommands.Help3Command;
-import com.AkoBot.Commands.HelpCommands.HelpCommand;
+import com.AkoBot.Commands.HelpCommands.*;
 import com.AkoBot.Commands.MinecraftCommands.MinecraftEndCommand;
 import com.AkoBot.Commands.MinecraftCommands.MinecraftInfoCommand;
 import com.AkoBot.Commands.MinecraftCommands.MinecraftStartCommand;
@@ -21,9 +18,9 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.slf4j.LoggerFactory;
 
 
-public class CommandController {
+class CommandController {
 	private BandoriSongs bandoriSongs = null;
-	final org.slf4j.Logger logger = LoggerFactory.getLogger(CommandController.class);
+//	final org.slf4j.Logger logger = LoggerFactory.getLogger(CommandController.class);
 	private BandoriCards bandoriCards = null;
 	private MusicManager musicManager = new MusicManager();
 	private BandoriMembers bandoriMembers = null;
@@ -35,7 +32,7 @@ public class CommandController {
 	 *
 	 * @param messageReceivedEvent MessageReceivedEvent
 	 */
-	public void commandController(MessageReceivedEvent messageReceivedEvent, EventWaiter waiter) {
+    void commandController(MessageReceivedEvent messageReceivedEvent, EventWaiter waiter) {
 		//get textchannel message was sent from and the appropriate command
 		TextChannel textChannel = messageReceivedEvent.getTextChannel();
 		String tag;
@@ -105,6 +102,9 @@ public class CommandController {
 			case "$help3":
 				new Help3Command().Help3(messageReceivedEvent);
 				break;
+            case "$help4":
+                new Help4Command().Help4(messageReceivedEvent);
+                break;
 			case "$play":
 				new MusicPlayCommand().Play(messageReceivedEvent, musicManager);
 				break;
@@ -169,7 +169,7 @@ public class CommandController {
 				incorrectCommandResponse(textChannel);
 		}
 	}
-	public void shutDownMusic() {
+	void shutDownMusic() {
 		new MusicShutdownCommand().shutDownMusic(musicManager);
 		profiles.saveAll();
 	}

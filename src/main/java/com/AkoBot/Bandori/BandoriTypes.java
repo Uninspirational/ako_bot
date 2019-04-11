@@ -1,7 +1,5 @@
 package com.AkoBot.Bandori;
 
-import com.AkoBot.Music.Song;
-
 import java.awt.*;
 
 public class BandoriTypes {
@@ -35,7 +33,7 @@ public class BandoriTypes {
                 return null;
         }
     }
-    public int getMemberId(String string) {
+    int getMemberId(String string) {
         string = string.toLowerCase();
         switch (string) {
             //Roselia
@@ -126,7 +124,7 @@ public class BandoriTypes {
                 return -1;
         }
     }
-    public MemberType getMemberType(int id) {
+    MemberType getMemberType(int id) {
         switch (id) {
             //Roselia
             case 30:
@@ -191,7 +189,7 @@ public class BandoriTypes {
                 return null;
         }
     }
-    public MemberType getMemberType(String string) {
+    MemberType getMemberType(String string) {
         string = string.toLowerCase();
         switch (string) {
             //Roselia
@@ -283,7 +281,7 @@ public class BandoriTypes {
         }
     }
 
-    public int getAttributeColor(String attribute) {
+    int getAttributeColor(String attribute) {
         switch (attribute) {
             case "Pure":
                 return 0x00E100;
@@ -297,7 +295,7 @@ public class BandoriTypes {
                 return 0x000000;
         }
     }
-    public String getBandIcon(String bandname) {
+    String getBandIcon(String bandname) {
         switch (bandname) {
             case ("Poppin'Party") :
                 return "https://vignette.wikia.nocookie.net/bandori/images/1/1f/PoPiPa_icon.png/revision/latest?cb=20180522125930";
@@ -313,7 +311,7 @@ public class BandoriTypes {
                 return "https://vignette.wikia.nocookie.net/bandori/images/8/84/Ako_PICO_Icon.png/revision/latest?cb=20180715113757";
         }
     }
-    public Color getColor(MemberType member) {
+    Color getColor(MemberType member) {
         switch (member) {
             //Afterglow
             case MITAKE_RAN:
@@ -543,5 +541,17 @@ public class BandoriTypes {
         else if (message.contains("short"))
             return SongType.SHORT;
         return null;
+    }
+    public BandType getBandTypeFromMemberId(int id) {
+        if (id >= 6 && id <= 10)
+            return BandType.POPIPA;
+        else if (id >= 11 && id <= 15)
+            return BandType.AFTERGLOW;
+        else if (id >= 16 && id <= 20)
+            return BandType.HELLOHAPPY;
+        else if (id >= 21 && id <= 25)
+            return BandType.PASUPARE;
+        else
+            return BandType.ROSELIA;
     }
 }

@@ -1,6 +1,5 @@
 package com.AkoBot.Bandori;
 
-import com.AkoBot.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,14 +14,13 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
 public class BandoriMembers {
     private ArrayList<BandoriMember> bandoriMembers;
-    final org.slf4j.Logger logger = LoggerFactory.getLogger(BandoriMembers.class);
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(BandoriMembers.class);
 
     public void bandoriRefresh(MessageReceivedEvent messageReceivedEvent) {
         try {
@@ -122,7 +120,7 @@ public class BandoriMembers {
             textChannel.sendMessage("You recite the spell like this: $member <category> <search term>").queue();
         }
     }
-    public void searchForMember(TextChannel textChannel, String keyterm, String category) {
+    private void searchForMember(TextChannel textChannel, String keyterm, String category) {
         ArrayList<BandoriMember> result = new ArrayList<>();
         for (BandoriMember bandoriMember: bandoriMembers) {
             if (bandoriMember.search(category, keyterm)) {
@@ -138,13 +136,13 @@ public class BandoriMembers {
             textChannel.sendMessage("No members found").queue();
         }
     }
-    public void cardPrinter(TextChannel textChannel, BandoriMember bandoriMember) {
+    private void cardPrinter(TextChannel textChannel, BandoriMember bandoriMember) {
         EmbedBuilder embedBuilder = bandoriMember.getEmbedMessage();
         MessageBuilder messageBuilder = new MessageBuilder()
                 .setEmbed(embedBuilder.build());
         textChannel.sendMessage(messageBuilder.build()).queue();
     }
-    public void multipleResultPrinter(TextChannel textChannel, ArrayList<BandoriMember> arrayList, String category, String keyterm) {
+    private void multipleResultPrinter(TextChannel textChannel, ArrayList<BandoriMember> arrayList, String category, String keyterm) {
         String list = "";
         int i = 0;
         while (i < 25 && i < arrayList.size()){
@@ -165,10 +163,10 @@ public class BandoriMembers {
                 .setEmbed(embedBuilder.build());
         textChannel.sendMessage(messageBuilder.build()).queue();
     }
-    public String searchById(int id) {
+    String searchById(int id) {
         return bandoriMembers.get(id - 6).getName();
     }
-    public BandoriMember getMemberById(int id) {
+    BandoriMember getMemberById(int id) {
         for (BandoriMember bandoriMember : this.bandoriMembers) {
             if (bandoriMember.getId() == id) {
                 return bandoriMember;

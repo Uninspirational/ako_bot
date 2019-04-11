@@ -2,6 +2,7 @@ package com.AkoBot.Commands;
 
 import com.AkoBot.Bandori.BandoriCard;
 import com.AkoBot.Bandori.BandoriCards;
+import com.AkoBot.Bandori.BandoriTeam;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,20 +10,17 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 public class Profile {
-    private String directory = "./src/main/resources/profiles/";
     private String userId;
     private ArrayList<BandoriCard> cards = null;
-    private BandoriCard[] team = new BandoriCard[5];
-
+    private BandoriTeam team;
 
     public Profile(String userId) {
         this.cards = new ArrayList<>();
         this.userId = userId;
     }
 
-    public boolean addCards(BandoriCard bandoriCard) {
+    public void addCards(BandoriCard bandoriCard) {
         this.cards.add(bandoriCard);
-        return true;
     }
 
     public boolean loadSave (String userId, BandoriCards bandoriCards) {
@@ -55,7 +53,7 @@ public class Profile {
                         if (card.getId() == Integer.parseInt(id)) {
                             card.setXp(Integer.parseInt(xp));
                             card.setLevel(Integer.parseInt(level));
-                            cards.add(card);
+                            team.addCard(card);
                         }
                     }
                 }
@@ -74,7 +72,7 @@ public class Profile {
 
 
 
-    public boolean saveProfile() {
+    public void saveProfile() {
         try {
             RandomAccessFile raf = new RandomAccessFile(fileNameGetter(), "w");
             String save = "";
@@ -82,14 +80,12 @@ public class Profile {
                 save = save.concat(bandoriCard.getId() + " " + bandoriCard.getXp() + " " + bandoriCard.getLevel() + "\n");
             }
             save = save.concat("TEAM");
-            for (BandoriCard bandoriCard: team) {
+            for (BandoriCard bandoriCard: team.getTeam()) {
                 save = save.concat(bandoriCard.getId() + " " + bandoriCard.getXp() + " " + bandoriCard.getLevel() + "\n");
             }
             raf.writeChars(save);
-            return true;
         }
         catch (IOException f) {
-            return false;
         }
     }
 
@@ -106,27 +102,28 @@ public class Profile {
     }
 
     private String fileNameGetter() {
-        return this.directory + userId + ".txt";
+        String directory = "./src/main/resources/profiles/";
+        return directory + userId + ".txt";
     }
-
-
-
-
-
-
-
-
 
 
     public ArrayList<BandoriCard> getCards() {
         return cards;
     }
 
-    public BandoriCard[] getTeam() {
+    public BandoriTeam getTeam() {
         return team;
     }
 
     public String getUserId() {
         return userId;
     }
+
+
+
+
+
+
+
+
 }

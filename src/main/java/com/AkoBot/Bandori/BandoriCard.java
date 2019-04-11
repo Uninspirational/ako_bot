@@ -15,6 +15,7 @@ public class BandoriCard {
     private String cameo_members;
     private String i_attribute;
     private int i_rarity;
+    private boolean isTrained = false;
     private String rarityStars;
     private String japanese_name;
     private String release_date;
@@ -43,7 +44,8 @@ public class BandoriCard {
     private int visual_trained_max;
     private int xp;
     private int level;
-    public BandoriCard(JsonObject jsonObject, BandoriMembers bandoriMembers) {
+    @SuppressWarnings("ConstantConditions")
+    BandoriCard(JsonObject jsonObject, BandoriMembers bandoriMembers) {
         this.xp = 0;
         this.level = 1;
         this.jsonObject = jsonObject.getAsJsonObject();
@@ -93,7 +95,8 @@ public class BandoriCard {
 
 
     }
-    public EmbedBuilder getEmbedBuilder(BandoriMembers bandoriMembers, boolean trained) {
+    @SuppressWarnings("ConstantConditions")
+    EmbedBuilder getEmbedBuilder(BandoriMembers bandoriMembers, boolean trained) {
         BandoriTypes bandoriTypes = new BandoriTypes();
         EmbedBuilder embedBuilder = null;
         try {
@@ -145,15 +148,14 @@ public class BandoriCard {
     }
     public boolean search(String category, String term) {
         BandoriTypes bandoriTypes = new BandoriTypes();
-        if (category.equals("membername")) {
-            return bandoriTypes.getMemberType(term) == bandoriTypes.getMemberType(member);
-        }
-        else if (category.equals("memberid")) {
-            int id = bandoriTypes.getMemberId(term);
-            return this.id == id;
-        }
-        else{
-            return this.jsonObject.get(category).toString().toLowerCase().contains(term);
+        switch (category) {
+            case "membername":
+                return bandoriTypes.getMemberType(term) == bandoriTypes.getMemberType(member);
+            case "memberid":
+                int id = bandoriTypes.getMemberId(term);
+                return this.id == id;
+            default:
+                return this.jsonObject.get(category).toString().toLowerCase().contains(term);
         }
     }
 
@@ -193,10 +195,12 @@ public class BandoriCard {
         return member;
     }
 
+    @SuppressWarnings("unused")
     public String getI_skill_type() {
         return i_skill_type;
     }
 
+    @SuppressWarnings("unused")
     public String getI_attribute() {
         return i_attribute;
     }
@@ -220,8 +224,8 @@ public class BandoriCard {
     public BandoriMember getBandoriMember() {
         return bandoriMember;
     }
-
-    public boolean addXp(int xp) {
+    @SuppressWarnings("unused")
+    private boolean addXp(int xp) {
         this.xp += xp;
         if (this.xp >= level * 100) {
             this.xp -= level * 100;
@@ -237,5 +241,55 @@ public class BandoriCard {
 
     private String cutter(JsonElement jsonElement) {
         return jsonElement.toString() != null ? jsonElement.toString().substring(1, jsonElement.toString().length() - 1) : null;
+    }
+
+    public boolean searchCameo(BandoriCard bandoriCard) {
+        if (this.cameo_members == null || !this.cameo_members.equals("")) {
+            return false;
+        }
+        String id = bandoriCard.getId() + "";
+        for (String search : this.cameoArray()) {
+            if (id.equals(search)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public int getCameos(BandType type) {
+        int total = 0;
+        if (this.cameo_members != null && this.cameo_members.equals("")) {
+            for (String search : this.cameoArray()) {
+                if (new BandoriTypes().getBandTypeFromMemberId(Integer.parseInt(search)).equals(type))
+                    total++;
+            }
+        }
+        return total;
+    }
+
+    private String[] cameoArray() {
+        String temp = cameo_members.replace(" ", "");
+        return temp.split(",");
+    }
+    //FIXME
+    public int getVisual() {
+        int increase = this.visual_max - this.visual_min;
+        if (isTrained)
+            increase  = this.visual_trained_max - this.visual_min;
+        double level = this.level /= 100.0;
+        return this.visual_min + (int) (increase * level);
+    }
+    public int getTechnique() {
+        int increase = this.technique_max - this.technique_min;
+        if (isTrained)
+            increase  = this.technique_max - this.technique_min;
+        double level = this.level /= 100.0;
+        return this.technique_min + (int) (increase * level);
+    }
+    public int getPerformance() {
+        int increase = this.performance_max - this.performance_min;
+        if (isTrained)
+            increase  = this.performance_trained_max- this.performance_min;
+        double level = this.level /= 100.0;
+        return this.performance_min + (int) (increase * level);
     }
 }

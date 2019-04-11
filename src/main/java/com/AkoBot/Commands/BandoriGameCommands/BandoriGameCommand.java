@@ -4,6 +4,7 @@ import com.AkoBot.Bandori.BandoriCard;
 import com.AkoBot.Commands.Profile;
 import com.AkoBot.Commands.Profiles;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -16,51 +17,45 @@ public class BandoriGameCommand {
     public BandoriGameCommand(final MessageReceivedEvent messageReceivedEvent, EventWaiter waiter, Profiles profiles) {
         this.profiles = profiles;
         final TextChannel textChannel = messageReceivedEvent.getTextChannel();
-        Profile profile1 = this.profiles.getProfile(messageReceivedEvent.getAuthor().getId());
-        for (BandoriCard card : profile1.getTeam()) {
-            if (card == null) {
-                textChannel.sendMessage("Please choose your band first!").queue();
-                return;
-            }
-
-        }
+        //ask for opponent name
         textChannel.sendMessage("Who would you like to battle?").queue();
-        waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getAuthor().equals(messageReceivedEvent.getAuthor()) && !e.getChannel().equals(messageReceivedEvent.getChannel()), e -> {
-            try {
-                Member member = e.getMessage().getMentionedMembers().get(0);
-            }
-            catch (IndexOutOfBoundsException f) {
-                textChannel.sendMessage("Please mention a user").queue();
-            }
-            textChannel.sendMessage(e.getAuthor().getName()).queue();
-            textChannel.sendMessage("Success!").queue();
-        }, 25, TimeUnit.SECONDS, () ->
-            messageReceivedEvent.getTextChannel().sendMessage("Timed out").queue()
+        waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getAuthor().equals(messageReceivedEvent.getAuthor()) && e.getChannel().equals(messageReceivedEvent.getChannel()), e -> {
+                    try {
+                        //get opponent
+                        Member member2 = e.getMessage().getMentionedMembers().get(0);
+                        waiter.waitForEvent(GuildMessageReceivedEvent.class, g -> member2.equals(g.getMember()) && g.getChannel().equals(textChannel), g -> {
+                            //if opponent responded
+                            Member member1 = messageReceivedEvent.getMember();
+                            //check for full team
+                            if (!checkTeam(member1) || !checkTeam(member2))
+                                textChannel.sendMessage("Both players must have a full team!").queue();
+                            //run game if both have teams
+                            else runGame(textChannel, member1, member2);
+                        }, 60, TimeUnit.SECONDS, () ->
+                                textChannel.sendMessage("Opponent did not respond in time").queue());
+
+                    }
+                    catch (IndexOutOfBoundsException f) {
+                        textChannel.sendMessage("Please mention a user").queue();
+                    }
+                }, 25, TimeUnit.SECONDS, () ->
+                        messageReceivedEvent.getTextChannel().sendMessage("Timed out").queue()
         );
     }
     private void runGame(TextChannel textChannel, Member member1, Member member2) {
         Profile profile1 = profiles.getProfile(member1.getUser().getId());
         Profile profile2 = profiles.getProfile(member2.getUser().getId());
-        for (BandoriCard card : profile2.getTeam()) {
-            if (card == null) {
-                textChannel.sendMessage("That user does not have a band!").queue();
-                return;
-            }
-        }
-    }
-    private void checkSynergy(TextChannel textChannel, BandoriCard[] team) {
-        //instrument, band, skills, type, 3 stats, trained
-        //cool, happy, power, pure
-        int[] attribute = new int[4];
-        //Afterglow, HelloHappy, Pasupare, PPP, Ras, Roselia
-        int[] band = new int[5];
-        //bass, dj, drums, guitar, guitar & vocals, keyboard, vocal
-        int[] instrument = new int[7];
-        for (BandoriCard card : team) {
-            attribute[card.getAttributeInt()]++;
-            band[card.getBandoriMember().getId()]++;
-            instrument[card.getBandoriMember().getInstrumentInt()]++;
-        }
+        String team1Synergy = profile1.getTeam().checkSynergy();
+        String team2Synergy = profile2.getTeam().checkSynergy();
+        //send embed message with synergy for both players
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.addField("Bonuses for " + member1.getAsMention(), team1Synergy, false)
+                .addField("Bonuses for " + member2.getAsMention(), team2Synergy, false);
+        //cases to check for synergy and use them
 
+    }
+
+    private boolean checkTeam(Member member) {
+        return this.profiles.getProfile(member.getUser().getId()).getTeam().isFull();
     }
 }

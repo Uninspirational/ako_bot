@@ -1,8 +1,6 @@
 package com.AkoBot.Bandori;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.core.entities.Member;
-
 
 public class BandoriSong {
     private String name;
@@ -21,21 +19,21 @@ public class BandoriSong {
         this.songType = songType;
     }
 
-    /**
-     * constructors
-     * @param name of song
-     * @param url to
-     * @param id
-     * @param songType
-     */
-    public BandoriSong(String name, String url, int id, SongType songType) {
-        this(name, url, null, id, songType);
-    }
-    public BandoriSong(String name, String url, SongType songType) {
-        this(name, url, null, -1, songType);
-    }
+//    /**
+//     * constructors
+//     * @param name of song
+//     * @param url to
+//     * @param id
+//     * @param songType
+//     */
+//    public BandoriSong(String name, String url, int id, SongType songType) {
+//        this(name, url, null, id, songType);
+//    }
+//    public BandoriSong(String name, String url, SongType songType) {
+//        this(name, url, null, -1, songType);
+//    }
 
-    public void setThumbnail(String thumbnail) {
+    void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
 
@@ -46,7 +44,7 @@ public class BandoriSong {
     public void setBand(String band) { this.band = band; }
     public void setName(String name) { this.name = name; }
 
-    public void setWiki(String wiki) {
+    void setWiki(String wiki) {
         this.wiki = wiki;
     }
 
@@ -66,7 +64,7 @@ public class BandoriSong {
         return this.url;
     }
 
-    public SongType getSongType() { return this.songType; }
+    SongType getSongType() { return this.songType; }
 
     public int getId() { return this.id; }
 

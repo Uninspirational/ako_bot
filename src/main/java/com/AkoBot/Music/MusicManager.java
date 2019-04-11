@@ -14,7 +14,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,10 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MusicManager {
-    private final org.slf4j.Logger logger = LoggerFactory.getLogger(MusicManager.class);
+//    private final org.slf4j.Logger logger = LoggerFactory.getLogger(MusicManager.class);
 
     private final AudioPlayerManager manager = new DefaultAudioPlayerManager();
-    private final Map<String, MusicController> players = new HashMap<String, MusicController>();
+    private final Map<String, MusicController> players = new HashMap<>();
 
     /**
      *
@@ -54,16 +54,6 @@ public class MusicManager {
     }
 
     /**
-     * remove player after disconnecting
-     * @param guild guild bot was in
-     */
-    public void removePlayer(Guild guild) {
-        if(players.containsKey(guild.getId())) {
-            players.remove(guild.getId());
-        }
-    }
-
-    /**
      *
      * @return the audio player manager
      */
@@ -76,9 +66,8 @@ public class MusicManager {
      * @param textChannel where search command came from
      * @param source keyword to search for
      * @param member user who requested video
-     * @return true if found
      */
-    public boolean searchVideo(TextChannel textChannel, String source, Member member) {
+    private void searchVideo(TextChannel textChannel, String source, Member member) {
         String keyword = source.replace(" ", "+");
         String apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q=" + keyword + "&key=AIzaSyCXPibw1rn9TvyrIhwJfIJ2AErh-DCYBHA";
         try {
@@ -105,20 +94,16 @@ public class MusicManager {
         }
         catch (MalformedURLException e) {
             e.printStackTrace();
-            return false;
         }
         catch (SocketTimeoutException f) {
             textChannel.sendMessage("Ako lost connection. Returning to room selection... Rin-rin... my live boosts...").queue();
-            return false;
         }
         catch (IOException g) {
             g.printStackTrace();
-            return false;
         }
         catch (NullPointerException h) {
             textChannel.sendMessage("No results found...").queue();
         }
-        return true;
     }
     /**
      * adds a track to be played
@@ -126,6 +111,7 @@ public class MusicManager {
      * @param source the name of the song
      * @param member the member who sent the command
      */
+    @SuppressWarnings("unused")
     public void loadTrack(final TextChannel textChannel, final String source, final Member member, final BandoriSong bandoriSong){
         final Guild guild = textChannel.getGuild();
         final MusicController player = getPlayer(guild);

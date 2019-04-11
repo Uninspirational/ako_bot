@@ -1,6 +1,5 @@
 package com.AkoBot.Bandori;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class BandoriCollection {
@@ -10,14 +9,12 @@ public class BandoriCollection {
     private String wikiUrl;
     private int length = 0;
     private String thumbNail;
-    private String key;
     private String description;
-    public BandoriCollection(String name, String wikiUrl, String description, BandType[] band, String thumbNail, String key) {
+    BandoriCollection(String name, String wikiUrl, String description, BandType[] band, String thumbNail) {
         this.name = name;
         this.wikiUrl = wikiUrl;
         this.bandoriSongs = new LinkedList<>();
         this.thumbNail = thumbNail;
-        this.key = key;
         this.description = description;
         this.band = band;
     }
@@ -26,15 +23,15 @@ public class BandoriCollection {
     public void setName(String name) {
         this.name = name;
     }
-
+    @SuppressWarnings("unused")
     public void setThumbNail(String thumbNail) {
         this.thumbNail = thumbNail;
     }
-
+    @SuppressWarnings("unused")
     public void setWikiUrl(String wikiUrl) {
         this.wikiUrl = wikiUrl;
     }
-
+    @SuppressWarnings("unused")
     public void setDescription(String description) {
         this.description = description;
     }
@@ -47,7 +44,7 @@ public class BandoriCollection {
         this.band = band;
     }
 
-    public void addSong(BandoriSong bandoriSong) {
+    void addSong(BandoriSong bandoriSong) {
         this.length++;
         this.bandoriSongs.add(bandoriSong);
     }
@@ -55,7 +52,7 @@ public class BandoriCollection {
     public LinkedList<BandoriSong> getAllSongs() {
         return this.bandoriSongs;
     }
-
+    @SuppressWarnings("unused")
     public BandoriSong searchByType(String type) {
         SongType songType = null;
         type = type.toLowerCase();

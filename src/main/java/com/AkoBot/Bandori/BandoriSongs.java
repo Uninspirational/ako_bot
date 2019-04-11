@@ -214,9 +214,6 @@ public class BandoriSongs {
             temp = temp.getAsJsonObject("" + id);
             return temp.getAsJsonPrimitive("thumbnail").getAsString();
         }
-        catch (ClassCastException e) {
-            return "";
-        }
         catch (NullPointerException f) {
             return "";
         }
@@ -514,7 +511,7 @@ public class BandoriSongs {
                     description = getDescription(id);
                     bands = bandNames(description);
                     //create collection, add song, and add it to hashtable
-                    BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail, key);
+                    BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail);
                     song.setBand(collection.getBand());
                     song.setWiki(wikiUrl);
                     song.setThumbnail(thumbnail);
@@ -554,7 +551,7 @@ public class BandoriSongs {
                         description = getDescription(id);
                         bands = bandNames(description);
                         //create collection
-                        BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail, key);
+                        BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail);
                         song.setBand(collection.getBand());
                         song.setWiki(wikiUrl);
                         song.setThumbnail(thumbnail);
@@ -577,7 +574,7 @@ public class BandoriSongs {
      * @param string string to edit
      * @return alphanumeric string with no spaces
      */
-    public String removeSpecial(String string) {
+    String removeSpecial(String string) {
         string = string.replace("-", "");
         string = string.replace(" ", "");
         string = string.replace("_", "");

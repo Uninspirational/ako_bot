@@ -23,7 +23,7 @@ public class HelpCommand {
                         .addField("$help2",
                                 "Display the WIKI commands", false)
                         .addField("$help3","Display the card and member search commands", false)
-                        .addField("$help$","Display gacha commands", false);
+                        .addField("$help4","Display gacha commands", false);
 //						.addField("Music Commands",
 //								"**$play <video link> *or* <youtube search term>** - will join and play audio\n" +
 //										"**$join** - join the voice channel\n" +

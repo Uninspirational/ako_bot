@@ -1,7 +1,6 @@
 package com.AkoBot.Commands.BandoriCommands;
 
 import com.AkoBot.Bandori.*;
-import com.AkoBot.Commands.BandoriCommands.BandoriSongLoadCommand;
 import com.AkoBot.Commands.JoinCommand;
 import com.AkoBot.Music.MusicManager;
 import net.dv8tion.jda.core.EmbedBuilder;

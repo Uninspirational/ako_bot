@@ -2,9 +2,7 @@ package com.AkoBot.Music;
 
 import com.AkoBot.Bandori.BandoriSong;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.VoiceChannel;
 
 public class Song{
     private AudioTrack audioTrack;
@@ -18,7 +16,7 @@ public class Song{
      * @param member person who requested the song
      * @param bandoriSong bandori song (may be null)
      */
-    public Song (AudioTrack audioTrack, Member member, BandoriSong bandoriSong){
+    Song(AudioTrack audioTrack, Member member, BandoriSong bandoriSong){
         this.audioTrack = audioTrack;
         this.member = member;
         this.bandoriSong = bandoriSong;

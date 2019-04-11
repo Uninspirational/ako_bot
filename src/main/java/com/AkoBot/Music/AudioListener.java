@@ -16,7 +16,7 @@ public class AudioListener extends AudioEventAdapter {
      *
      * @param audioPlayer audioPlayer
      */
-    public AudioListener(AudioPlayer audioPlayer) {
+    AudioListener(AudioPlayer audioPlayer) {
         this.audioPlayer = audioPlayer;
         this.tracks = new LinkedBlockingQueue<>();
     }
@@ -33,7 +33,7 @@ public class AudioListener extends AudioEventAdapter {
      *
      * @return returns the audioplayer
      */
-    public AudioPlayer getAudioPlayer() {
+    private AudioPlayer getAudioPlayer() {
         return this.audioPlayer;
     }
 
@@ -41,7 +41,7 @@ public class AudioListener extends AudioEventAdapter {
      * adds a song to the queue
      * @param song song to add
      */
-    public void addTrack(Song song) {
+    void addTrack(Song song) {
         tracks.add(song);
         if (audioPlayer.getPlayingTrack() == null) {
             if (song.getBandoriSong() != null) {
@@ -56,17 +56,10 @@ public class AudioListener extends AudioEventAdapter {
     }
 
     /**
-     * returns the size of the queue
-     *
-     * @return queue size
-     */
-    public int getTrackSize() {
-        return tracks.size();
-    }
-    /**
      * play the next song
      */
-    public void playNextTrack() throws NullPointerException{
+    @SuppressWarnings("ConstantConditions")
+    void playNextTrack() throws NullPointerException{
         tracks.poll();
         try
         {
