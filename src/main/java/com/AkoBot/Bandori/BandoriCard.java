@@ -51,7 +51,7 @@ public class BandoriCard {
         this.jsonObject = jsonObject.getAsJsonObject();
         this.member = jsonObject.get("member").getAsInt();
         this.id = jsonObject.get("id").getAsInt();
-        this.bandoriMember = bandoriMembers.getMemberById(this.id);
+        this.bandoriMember = bandoriMembers.getMemberById(this.member);
         this.name = cutter(jsonObject.get("name"));
         this.cameo_members = cutter(jsonObject.get("cameo_members"));
         this.i_attribute = cutter(jsonObject.get("i_attribute"));
@@ -254,6 +254,11 @@ public class BandoriCard {
             }
         }
         return false;
+    }
+    public String getCardDescription() {
+        return getName() + " (" + getBandoriMember().getName() + ") - " +
+                "P: " + getPerformance() + " T: " + getTechnique() + " V: " + getVisual()
+                + getI_skill_type();
     }
     public int getCameos(BandType type) {
         int total = 0;
