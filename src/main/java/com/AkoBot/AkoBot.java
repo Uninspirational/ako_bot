@@ -27,7 +27,7 @@ public class AkoBot extends ListenerAdapter{
     public static void main(String[] args) throws LoginException, InterruptedException, IllegalArgumentException {
         System.setProperty("http.agent", "Chrome");
         akoBot = new JDABuilder(AccountType.BOT)
-                .setToken(authkey.key)         // The token of the account that is logging in.
+                .setToken(authkey.authTokenkey)         // The token of the account that is logging in.
                 .addEventListener(new AkoBot())
                 .addEventListener(waiter)
                 .setAudioEnabled(true)
