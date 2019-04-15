@@ -1,6 +1,7 @@
 package com.AkoBot.Music;
 
 import com.AkoBot.Bandori.BandoriSong;
+import com.AkoBot.authkey;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -69,7 +70,7 @@ public class MusicManager {
      */
     private void searchVideo(TextChannel textChannel, String source, Member member) {
         String keyword = source.replace(" ", "+");
-        String apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q=" + keyword + "&key=AIzaSyCXPibw1rn9TvyrIhwJfIJ2AErh-DCYBHA";
+        String apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q=" + keyword + "&key=" + authkey.googleApi;
         try {
             //connect to url
             URL url = new URL(apiUrl);
