@@ -12,76 +12,137 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class BandoriTeam {
+    //actual team
     private ArrayList<BandoriCard> team;
+    //temporary team for running game
     private ArrayList<BandoriCard> gameTeam;
+    private int size;
     public BandoriTeam() {
         this.team = new ArrayList<>();
+        this.size = 0;
     }
-    public void addCard(MessageReceivedEvent messageReceivedEvent, BandoriCards bandoriCards, EventWaiter waiter) {
+    public void addCardToTeam(MessageReceivedEvent messageReceivedEvent, ArrayList<BandoriCard> cards, EventWaiter waiter) {
         TextChannel textChannel = messageReceivedEvent.getTextChannel();
-        String currentTeam = "";
-        for (int i = 0; i < team.size(); i++) {
-            currentTeam = "[" + i + "]" + " - " + currentTeam + "\n";
+        StringBuilder currentTeam = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            System.out.println(i + " >= " + this.size);
+
+            if (i >= this.size)
+                currentTeam.append("[").append(i + 1).append("] - none\n");
+            else {
+                currentTeam.append("[").append(i + 1).append("] - ").append(team.get(i).getName()).append(" *(").append(team.get(i).getId()).append(")*\n");
+            }
         }
-        currentTeam = "Which member would you like to replace? Type the number or type $cancel";
         EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.addField(currentTeam, "", false);
+        embedBuilder.addField(currentTeam.toString(), "", false);
+        currentTeam = new StringBuilder("Which member would you like to replace? Type the number or type $cancel");
+        embedBuilder.addField(currentTeam.toString(), "", false);
         textChannel.sendMessage(embedBuilder.build()).queue();
-        waitForOldCard(messageReceivedEvent.getAuthor(), textChannel, waiter, bandoriCards);
+        waitForOldCard(messageReceivedEvent.getAuthor(), textChannel, waiter, cards);
+    }
+    public void viewTeam(MessageReceivedEvent messageReceivedEvent) {
+        TextChannel textChannel = messageReceivedEvent.getTextChannel();
+        StringBuilder currentTeam = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            if (i >= this.size)
+                currentTeam.append("[").append(i + 1).append("] - none\n");
+            else currentTeam.append("[").append(i + 1).append("] - ").append(team.get(i).getName()).append(" *(").append(team.get(i).getId()).append(")*\n");
+        }
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.addField("Your current band", currentTeam.toString(), false);
+        textChannel.sendMessage(embedBuilder.build()).queue();
     }
     public void addCard(BandoriCard bandoriCard) {
         team.add(bandoriCard);
+        this.size++;
     }
     public boolean isFull() {
-        return 5 == team.size();
+        return this.size == 5;
     }
-    private void waitForOldCard(User user, TextChannel channel, EventWaiter waiter, BandoriCards bandoriCards) {
+    private void waitForOldCard(User user, TextChannel channel, EventWaiter waiter, ArrayList<BandoriCard> cards) {
         waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().equals(channel) && e.getAuthor().equals(user), e -> {
             TextChannel textChannel = e.getChannel();
             String message = e.getMessage().getContentStripped().toLowerCase();
             if (message.equals("$cancel")) {
                 textChannel.sendMessage("Cancelled").queue();
-                return;
             }
-            try
-            {
-                int oldCard = Integer.parseInt(message);
-                waitForNewCard(user, textChannel, waiter, oldCard, bandoriCards);
-            }
-            catch (Exception f) {
-                textChannel.sendMessage("Please enter the corresponding number for the card you would like to replace").queue();
-                this.waitForOldCard(user, channel, waiter, bandoriCards);
+            else {
+                try {
+                    int oldCard = Integer.parseInt(message) - 1;
+                    waitForNewCard(user, textChannel, waiter, oldCard, cards);
+                } catch (Exception f) {
+                    textChannel.sendMessage("Please enter the corresponding number of the card you would like to replace or enter $cancel").queue();
+                    this.waitForOldCard(user, channel, waiter, cards);
+                }
             }
         }, 25, TimeUnit.SECONDS, () -> channel.sendMessage("Timed out").queue());
 
     }
-    private void waitForNewCard(User user, TextChannel channel, EventWaiter waiter, final int oldCard, BandoriCards bandoriCards) {
+    private void waitForNewCard(User user, TextChannel channel, EventWaiter waiter, final int oldCard, ArrayList<BandoriCard> cards) {
+        channel.sendMessage("Please enter the number of the card you would like to add to your team").queue();
         waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getChannel().equals(channel) && e.getAuthor().equals(user), e -> {
             TextChannel textChannel = e.getChannel();
             String message = e.getMessage().getContentStripped().toLowerCase();
             if (message.equals("$cancel")) {
                 textChannel.sendMessage("Cancelled").queue();
-                return;
             }
-            try
-            {
-                int newCard = Integer.parseInt(message);
-                replaceCard(newCard, oldCard, bandoriCards);
-            }
-            catch (Exception f) {
-                textChannel.sendMessage("Please enter the corresponding number for the new card you would like to add").queue();
-                this.waitForNewCard(user, channel, waiter, oldCard, bandoriCards);
+            else {
+                try {
+                    int newCard = Integer.parseInt(message) - 1;
+                    if (checkDuplicate(cards.get(newCard))) {
+                        textChannel.sendMessage("This card is already in your band!").queue();
+                    } else if (replaceCard(newCard, oldCard, cards))
+                        textChannel.sendMessage("Successfully added card to band").queue();
+                    else textChannel.sendMessage("Failed to add card to band").queue();
+                } catch (Exception f) {
+                    textChannel.sendMessage("Please enter the corresponding number for the new card you would like to add or enter $cancel").queue();
+                    this.waitForNewCard(user, channel, waiter, oldCard, cards);
+                }
             }
         }, 25, TimeUnit.SECONDS, () -> channel.sendMessage("Timed out").queue());
     }
-    private void replaceCard(int newCard, int oldCard, BandoriCards bandoriCards) {
-        BandoriCard[] cardsArray = (BandoriCard[]) this.team.toArray();
-        cardsArray[oldCard] = bandoriCards.getBandoriCards().get(newCard);
-        this.team.clear();
-        this.team.addAll(Arrays.asList(cardsArray));
+    private boolean replaceCard(int newCard, int oldCard, ArrayList<BandoriCard> cards) {
+        try {
+            this.size = 0;
+            BandoriCard[] cardsArray = new BandoriCard[5];
+            for (int i = 0; i < this.team.size(); i++) {
+                cardsArray[i] = this.team.get(i);
+                if (cardsArray[i] != null)
+                    size++;
+            }
+            if (cardsArray[oldCard] == null)
+                size++;
+            cardsArray[oldCard] = cards.get(newCard);
+            this.team.clear();
+            this.team.addAll(Arrays.asList(cardsArray));
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
-    public BandoriCard[] getTeam() {
-        return (BandoriCard[]) this.team.toArray();
+    public ArrayList<BandoriCard> getTeam() {
+        return this.team;
+    }
+
+    /**
+     *
+     * @param check new card to be added to team
+     * @return true if duplicate exists, false otherwise
+     */
+    private boolean checkDuplicate(BandoriCard check) {
+        for (BandoriCard card : this.team) {
+            if (check.getId() == card.getId())
+                return true;
+        }
+        return false;
+    }
+    public String getString() {
+        StringBuilder string = new StringBuilder();
+        for (BandoriCard card : this.getTeam()) {
+            string.append(card.getCardDescription()).append("\n");
+        }
+        return string.toString();
     }
     public int getStat(int card, int stat) {
         //0 = performance, 1 = technique, 2 = visual
@@ -195,8 +256,7 @@ public class BandoriTeam {
             teamSynergy += "Pure x 5: All stats increase by an additional 5%";
         }
         //all bonuses
-        // FIXME: 04/10/19
-        if (attribute[0] == attribute[1] && attribute[2] == attribute[3] && attribute[0] == attribute[3]) {
+        if (attribute[0] != 0 && attribute[1] != 0 && attribute[2] != 0 && attribute[3] != 0 && attribute[3] != 0) {
             this.allatts = true;
             teamSynergy += "Every attribute: Skill bonuses increased by 25%";
         }
