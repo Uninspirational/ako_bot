@@ -103,10 +103,10 @@ public class BandoriGachaCommand {
             embedBuilder.addField("Three Stars", three, false);
             embedBuilder.addField("Four Stars", four, false);
 
-
             MessageBuilder messageBuilder = new MessageBuilder().setEmbed(embedBuilder.build());
             textChannel.sendFile(new File(tempFP), messageBuilder.build()).queue();
 
+            profile.saveProfile();
 
         }
         catch (IOException e) {
