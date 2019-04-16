@@ -179,6 +179,8 @@ class CommandController {
                 new BandoriViewCards().viewCards(messageReceivedEvent, retrieveProfile(messageReceivedEvent), waiter);
                 break;
             case "$cancel":
+            case "$n":
+            case "$b":
                 break;
                 default:
                     incorrectCommandResponse(messageReceivedEvent.getTextChannel());

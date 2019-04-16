@@ -33,20 +33,38 @@ public class BandoriViewCards {
         Message send = restAction.complete();
         long messageId = send.getIdLong();
         if (i < size) {
-            nextPage(textChannel, messageReceivedEvent.getAuthor(), profile, waiter, start + 20, messageId);
+            nextPage(textChannel, messageReceivedEvent.getAuthor(), profile, waiter, start + 10, messageId);
         }
     }
     public void viewCards(MessageReceivedEvent messageReceivedEvent, Profile profile, EventWaiter waiter) {
         this.viewCards(messageReceivedEvent, profile, waiter, 0);
     }
     private void nextPage(TextChannel textChannel, User user, Profile profile, EventWaiter waiter, int start, long messageId) {
-        waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getMessage().getContentStripped().equals("$n") && e.getChannel().equals(textChannel) && e.getAuthor().equals(user), e -> {
-            final int size = profile.getCards().size();
-            EmbedBuilder embedBuilder = new EmbedBuilder();
-            String message = "";
-            ArrayList<BandoriCard> cards = profile.getCards();
-            BandoriCard temp;
-            int i;
+        waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> (e.getMessage().getContentStripped().equals("$b") || e.getMessage().getContentStripped().equals("$n")) && e.getChannel().equals(textChannel) && e.getAuthor().equals(user), e -> {
+            if (e.getMessage().getContentStripped().equals("$viewcards"))
+                return;
+            long delete = e.getMessageIdLong();
+            textChannel.deleteMessageById(delete).queue();
+            int move;
+            if (e.getMessage().getContentStripped().equals("$n"))
+                move = 10;
+            else
+                move = -10;
+            sendCardView(textChannel, start + move, profile, messageId);
+            nextPage(textChannel, user, profile, waiter, start + move, messageId);
+        }, 25, TimeUnit.SECONDS, null);
+    }
+    private void sendCardView(TextChannel textChannel, int start, Profile profile, long messageId) {
+        final int size = profile.getCards().size();
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        String message = "";
+        ArrayList<BandoriCard> cards = profile.getCards();
+        BandoriCard temp;
+        int i;
+        if (start < 0 || start + 10 > size) {
+            textChannel.sendMessage("No more!").queue();
+        }
+        else {
             for (i = start; i < size && i < start + 10; i++) {
                 temp = cards.get(i);
                 message += "[" + (i + 1) + "] - " + temp.getI_attribute() + " | **" + temp.getName() + "** | Lvl: " + temp.getLevel() + temp.getBandoriMember().getName() + " | *(" + temp.getId() + ")*\n";
@@ -54,7 +72,6 @@ public class BandoriViewCards {
             embedBuilder.addField("", message, false);
             embedBuilder.setFooter("Displaying " + (start + 1) + "-" + (i) + " out of " + size, null);
             textChannel.editMessageById(messageId, embedBuilder.build()).queue();
-            nextPage(textChannel, user, profile, waiter, start + 10, messageId);
-        }, 25, TimeUnit.SECONDS, null);
+        }
     }
 }
