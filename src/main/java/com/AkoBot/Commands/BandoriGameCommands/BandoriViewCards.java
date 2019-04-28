@@ -1,6 +1,8 @@
 package com.AkoBot.Commands.BandoriGameCommands;
 
 import com.AkoBot.Bandori.BandoriCard;
+import com.AkoBot.Bandori.BandoriMember;
+import com.AkoBot.Bandori.BandoriMembers;
 import com.AkoBot.Commands.Profile;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -11,6 +13,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.requests.RestAction;
 
+import javax.xml.soap.Text;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +39,22 @@ public class BandoriViewCards {
             nextPage(textChannel, messageReceivedEvent.getAuthor(), profile, waiter, start + 10, messageId);
         }
     }
+    public void viewCard(MessageReceivedEvent messageReceivedEvent, Profile profile, BandoriMembers bandoriMembers) {
+        String message = messageReceivedEvent.getMessage().getContentStripped();
+        TextChannel textChannel = messageReceivedEvent.getTextChannel();
+        try {
+            message = message.substring(message.indexOf(" ") + 1);
+            int cardNum = Integer.parseInt(message) - 1;
+            EmbedBuilder embedBuilder = profile.getCards().get(cardNum).getEmbedBuilder(bandoriMembers);
+            textChannel.sendMessage(embedBuilder.build()).queue();
+        }
+        catch (IndexOutOfBoundsException e) {
+            textChannel.sendMessage("Please include the card number as well!").queue();
+        }
+        catch (NumberFormatException f) {
+            textChannel.sendMessage("Please use a numerical value!").queue();
+        }
+    }
     public void viewCards(MessageReceivedEvent messageReceivedEvent, Profile profile, EventWaiter waiter) {
         this.viewCards(messageReceivedEvent, profile, waiter, 0);
     }
@@ -50,11 +69,12 @@ public class BandoriViewCards {
                 move = 10;
             else
                 move = -10;
-            sendCardView(textChannel, start + move, profile, messageId);
+            if (!sendCardView(textChannel, start + move, profile, messageId))
+                return;
             nextPage(textChannel, user, profile, waiter, start + move, messageId);
         }, 25, TimeUnit.SECONDS, null);
     }
-    private void sendCardView(TextChannel textChannel, int start, Profile profile, long messageId) {
+    private boolean sendCardView(TextChannel textChannel, int start, Profile profile, long messageId) {
         final int size = profile.getCards().size();
         EmbedBuilder embedBuilder = new EmbedBuilder();
         String message = "";
@@ -63,6 +83,7 @@ public class BandoriViewCards {
         int i;
         if (start < 0 || start + 10 > size) {
             textChannel.sendMessage("No more!").queue();
+            return false;
         }
         else {
             for (i = start; i < size && i < start + 10; i++) {
@@ -73,5 +94,6 @@ public class BandoriViewCards {
             embedBuilder.setFooter("Displaying " + (start + 1) + "-" + (i) + " out of " + size, null);
             textChannel.editMessageById(messageId, embedBuilder.build()).queue();
         }
+        return true;
     }
 }

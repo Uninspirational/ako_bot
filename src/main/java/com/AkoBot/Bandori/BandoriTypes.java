@@ -465,9 +465,31 @@ public class BandoriTypes {
             return "Short";
         return null;
     }
+    String removeSpecial(String string) {
+        string = string.replace("-", "");
+        string = string.replace(" ", "");
+        string = string.replace("_", "");
+        string = string.replace("－", "");
+        string = string.replace("~", "");
+        string = string.replace(",", "");
+        string = string.replace("!", "");
+        string = string.replace("?", "");
+        string = string.replace("☆", "");
+        string = string.replace("・", "");
+        string = string.replace(":", "");
+        string = string.replace("'", "");
+        string = string.replace("♪", "");
+        string = string.replace("∞", "");
+        string = string.replace("◎", "");
+        string = string.replace(".", "");
+        string = string.replace("×", "x");
+        string = string.replace("(", "");
+        string = string.replace(")", "");
+        string = string.replace("*", "");
+        return string.toLowerCase();
+    }
     public BandType getBandType(String bandType) {
-        BandoriSongs bandoriSongs = new BandoriSongs();
-        bandType = bandoriSongs.removeSpecial(bandType);
+        bandType = removeSpecial(bandType);
         switch (bandType) {
             case "poppinparty":
             case "popipa":

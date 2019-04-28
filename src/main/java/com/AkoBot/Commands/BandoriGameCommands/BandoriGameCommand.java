@@ -55,8 +55,8 @@ public class BandoriGameCommand {
         String team2Synergy = profile2.getTeam().checkSynergy();
         //send embed message with synergy for both players
         EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.addField("Bonuses for " + member1.getAsMention(), team1Synergy, false)
-                .addField("Bonuses for " + member2.getAsMention(), team2Synergy, false)
+        embedBuilder.addField("", "**Bonuses for " + member1.getAsMention() + "**\n" + team1Synergy + "\n", false)
+                .addField("", "**Bonuses for " + member2.getAsMention() + "**\n" + team2Synergy + "\n", false)
                 .addField("Select a card!", "DM send to both players", false);
         textChannel.sendMessage(embedBuilder.build()).queue();
         //cases to check for synergy and use them

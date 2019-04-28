@@ -178,6 +178,9 @@ class CommandController {
             case "$viewcards":
                 new BandoriViewCards().viewCards(messageReceivedEvent, retrieveProfile(messageReceivedEvent), waiter);
                 break;
+            case "$viewcard":
+                new BandoriViewCards().viewCard(messageReceivedEvent, retrieveProfile(messageReceivedEvent), bandoriMembers);
+                break;
             case "$cancel":
             case "$n":
             case "$b":

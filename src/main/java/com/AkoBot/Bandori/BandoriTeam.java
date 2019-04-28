@@ -24,13 +24,14 @@ public class BandoriTeam {
     public void addCardToTeam(MessageReceivedEvent messageReceivedEvent, ArrayList<BandoriCard> cards, EventWaiter waiter) {
         TextChannel textChannel = messageReceivedEvent.getTextChannel();
         StringBuilder currentTeam = new StringBuilder();
+        BandoriCard[] array = getAsArray();
         for (int i = 0; i < 5; i++) {
             System.out.println(i + " >= " + this.size);
 
-            if (i >= this.size)
+            if (/*i >= this.size*/array[i] == null)
                 currentTeam.append("[").append(i + 1).append("] - none\n");
             else {
-                currentTeam.append("[").append(i + 1).append("] - ").append(team.get(i).getName()).append(" *(").append(team.get(i).getId()).append(")*\n");
+                currentTeam.append("[").append(i + 1).append("] - ").append(array[i].getName()).append(" *(").append(array[i].getId()).append(")*\n");
             }
         }
         EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -43,14 +44,27 @@ public class BandoriTeam {
     public void viewTeam(MessageReceivedEvent messageReceivedEvent) {
         TextChannel textChannel = messageReceivedEvent.getTextChannel();
         StringBuilder currentTeam = new StringBuilder();
+        BandoriCard[] array = getAsArray();
         for (int i = 0; i < 5; i++) {
-            if (i >= this.size)
+            if (array[i] == null)
                 currentTeam.append("[").append(i + 1).append("] - none\n");
-            else currentTeam.append("[").append(i + 1).append("] - ").append(team.get(i).getName()).append(" *(").append(team.get(i).getId()).append(")*\n");
+            else currentTeam.append("[").append(i + 1).append("] - ").append(array[i].getName()).append(" *(").append(array[i].getId()).append(")*\n");
         }
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.addField("Your current band", currentTeam.toString(), false);
         textChannel.sendMessage(embedBuilder.build()).queue();
+    }
+    private BandoriCard[] getAsArray() {
+        BandoriCard[] array = new BandoriCard[5];
+        for (int i = 0; i < 5; i++) {
+            try {
+                array[i] = team.get(i);
+            }
+            catch (Exception f) {
+                array[i] = null;
+            }
+        }
+        return array;
     }
     public void addCard(BandoriCard bandoriCard) {
         team.add(bandoriCard);
@@ -95,7 +109,7 @@ public class BandoriTeam {
                         textChannel.sendMessage("Successfully added card to band").queue();
                     else textChannel.sendMessage("Failed to add card to band").queue();
                 } catch (Exception f) {
-                    textChannel.sendMessage("Please enter the corresponding number for the new card you would like to add or enter $cancel").queue();
+                    f.printStackTrace();
                     this.waitForNewCard(user, channel, waiter, oldCard, cards);
                 }
             }
@@ -132,8 +146,9 @@ public class BandoriTeam {
      */
     private boolean checkDuplicate(BandoriCard check) {
         for (BandoriCard card : this.team) {
-            if (check.getId() == card.getId())
-                return true;
+            if (card != null)
+                if (check.getId() == card.getId())
+                    return true;
         }
         return false;
     }
@@ -209,13 +224,13 @@ public class BandoriTeam {
         //cool, happy, power, pure
         int[] attribute = new int[4];
         //Afterglow, HelloHappy, Pasupare, PPP, Ras, Roselia
-        int[] band = new int[5];
+        int[] band = new int[6];
         //bass, dj, drums, guitar, guitar & vocals, keyboard, vocal
         int[] instrument = new int[7];
 
         for (BandoriCard card : getTeam()) {
             attribute[card.getAttributeInt()]++;
-            band[card.getBandoriMember().getId()]++;
+            band[card.getBandoriMember().getBandInt()]++;
             instrument[card.getBandoriMember().getInstrumentInt()]++;
         }
         String teamSynergy = "";

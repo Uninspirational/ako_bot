@@ -27,6 +27,7 @@ public class Profile {
 
     public void addCardToTeam(MessageReceivedEvent messageReceivedEvent, EventWaiter waiter) {
         this.team.addCardToTeam(messageReceivedEvent, cards, waiter);
+        saveProfile();
     }
     public boolean loadSave (String userId, BandoriCards bandoriCards) {
         try {

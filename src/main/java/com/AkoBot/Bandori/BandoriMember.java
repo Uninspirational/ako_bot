@@ -76,6 +76,7 @@ public class BandoriMember {
     @SuppressWarnings("unused")
     public int getBandInt() {
         BandoriTypes types = new BandoriTypes();
+        System.out.println(this.i_band);
         if (types.getBandType(this.i_band).equals(BandType.AFTERGLOW)) {
             return 0;
         }

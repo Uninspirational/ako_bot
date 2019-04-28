@@ -95,8 +95,11 @@ public class BandoriCard {
 
 
     }
+    public EmbedBuilder getEmbedBuilder(BandoriMembers bandoriMembers) {
+        return getEmbedBuilder(bandoriMembers, isTrained).setFooter("Level: " + getLevel() + " Xp: " + getXp() + "/" + (getXp() * 100), null);
+    }
     @SuppressWarnings("ConstantConditions")
-    EmbedBuilder getEmbedBuilder(BandoriMembers bandoriMembers, boolean trained) {
+    public EmbedBuilder getEmbedBuilder(BandoriMembers bandoriMembers, boolean trained) {
         BandoriTypes bandoriTypes = new BandoriTypes();
         EmbedBuilder embedBuilder = null;
         try {
@@ -229,7 +232,7 @@ public class BandoriCard {
         this.xp += xp;
         if (this.xp >= level * 100) {
             this.xp -= level * 100;
-            xp += 1;
+            this.level += 1;
             if (this.xp >= level * 100) {
                 return addXp(0);
             }
@@ -258,7 +261,7 @@ public class BandoriCard {
     public String getCardDescription() {
         return getName() + " (" + getBandoriMember().getName() + ") - " +
                 "P: " + getPerformance() + " T: " + getTechnique() + " V: " + getVisual()
-                + getI_skill_type();
+                + " **" + getI_skill_type() + "**";
     }
     public int getCameos(BandType type) {
         int total = 0;

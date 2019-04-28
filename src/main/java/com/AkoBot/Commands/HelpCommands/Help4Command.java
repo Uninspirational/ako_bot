@@ -14,10 +14,14 @@ public class Help4Command {
         User user = messageReceivedEvent.getAuthor();
         EmbedBuilder embedBuilder =
                 new EmbedBuilder()
-                        .setTitle("List of Music Commands")
+                        .setTitle("List of Gacha Commands")
                         .setColor(new Color(0xBA00BA))
                         .addField("Gacha Commands",
-                                "**$gacha** - roll for gacha, will list the card ids\n",
+                                "**$gacha** - roll for gacha, will list the card ids\n" +
+                                        "**$viewcards** - display owned cards 10 at a time *type $n and $b to view the next/previous page of cards*\n" +
+                                        "**$addteam** - add a card to your team\n" +
+                                        "**$viewteam** - view your team\n" +
+                                        "**$viewcard <card number>** - view a card you own",
                                 false);
         MessageBuilder messageBuilder = new MessageBuilder()
                 .setEmbed(embedBuilder.build());
