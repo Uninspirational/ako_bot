@@ -8,5 +8,9 @@ public enum BandType {
     GURIGURI,
     ROSELIA,
     PASUPARE,
-    ARGONAVIS
+    ARGONAVIS,
+    CHISPA,
+    GFRIEND,
+    CHARACTERSONG,
+    HSPTW
 }

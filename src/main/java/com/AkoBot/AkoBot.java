@@ -1,4 +1,5 @@
 package com.AkoBot;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -16,6 +17,7 @@ public class AkoBot extends ListenerAdapter{
     private CommandController commandReader= new CommandController();
     private static JDA akoBot;
     private final Logger logger = LoggerFactory.getLogger(AkoBot.class);
+    private static EventWaiter waiter = new EventWaiter();
 
     /**
      * creat bot, connect, and add Event Listener
@@ -23,9 +25,11 @@ public class AkoBot extends ListenerAdapter{
      * @throws InterruptedException threads for music player
      */
     public static void main(String[] args) throws LoginException, InterruptedException, IllegalArgumentException {
+        System.setProperty("http.agent", "Chrome");
         akoBot = new JDABuilder(AccountType.BOT)
-                .setToken(authkey.key)         // The token of the account that is logging in.
+                .setToken(authkey.authTokenkey)         // The token of the account that is logging in.
                 .addEventListener(new AkoBot())
+                .addEventListener(waiter)
                 .setAudioEnabled(true)
                 .setGame(Game.playing("$help"))
                 .build();
@@ -47,7 +51,7 @@ public class AkoBot extends ListenerAdapter{
                     commandReader.shutDownMusic();
                     akoBot.shutdown();
                 } else
-                    commandReader.commandController(messageReceivedEvent);
+                    commandReader.commandController(messageReceivedEvent, waiter);
             }
         }
         catch (Exception e) {

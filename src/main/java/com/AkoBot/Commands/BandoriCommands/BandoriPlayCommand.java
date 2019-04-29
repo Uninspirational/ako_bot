@@ -1,7 +1,6 @@
 package com.AkoBot.Commands.BandoriCommands;
 
 import com.AkoBot.Bandori.*;
-import com.AkoBot.Commands.BandoriCommands.BandoriSongLoadCommand;
 import com.AkoBot.Commands.JoinCommand;
 import com.AkoBot.Music.MusicManager;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -100,9 +99,6 @@ public class BandoriPlayCommand {
                 for (String hit: hits) {
                     embedBuilder.addField("", "[" + collection.get(hit).getName() + "]" + "(" + collection.get(hit).getWikiUrl() + ")", false);
                 }
-                MessageBuilder messageBuilder = new MessageBuilder()
-                        .setEmbed(embedBuilder.build());
-                textChannel.sendMessage(messageBuilder.build()).queue();
             }
             //if user did ask to play all the songs
             else {
@@ -113,18 +109,20 @@ public class BandoriPlayCommand {
                 //go through all matching songs
                 for (String hit: hits) {
                     songs = collection.get(hit).getAllSongs();
-                    embedBuilder.addField("", "[" + collection.get(hit).getName() + "]" + "(" + collection.get(hit).getWikiUrl() + ")", false);
+//                    embedBuilder.addField("", "[" + collection.get(hit).getName() + "]" + "(" + collection.get(hit).getWikiUrl() + ") other version", false);
                     //if song type was requested
                     if (hasType) {
                         bandoriSong = collection.get(hit).searchByType(songType);
-                        loadBandoriSongCommand.loadBandoriSong(textChannel, bandoriSong, member, musicManager);
-                        embedBuilder.addField("","[" + bandoriSong.getName() + "added to queue](" + bandoriSong.getWiki()+ ")", false);
+                        if (bandoriSong != null) {
+                            loadBandoriSongCommand.loadBandoriSong(textChannel, bandoriSong, member, musicManager);
+                            embedBuilder.addField("", "[" + bandoriSong.getName() + "](" + bandoriSong.getWiki() + ")" + " added to queue", false);
+                        }
                     }
                     //if song type was not requested, default to first song
                     else {
                         bandoriSong = songs.get(0);
                         loadBandoriSongCommand.loadBandoriSong(textChannel, bandoriSong, member, musicManager);
-                        embedBuilder.addField("","[" + bandoriSong.getName() + "added to queue](" + bandoriSong.getWiki()+ ")", false);
+                        embedBuilder.addField("","[" + bandoriSong.getName() + "](" + bandoriSong.getWiki()+ ")" + " added to queue", false);
                     }
                 }
             }
@@ -140,6 +138,7 @@ public class BandoriPlayCommand {
             embedBuilder
                     .setTitle(result.getName(), result.getWikiUrl())
                     .setThumbnail(result.getThumbNail())
+                    .setDescription("Found exact match")
                     .setAuthor(result.getBand());
             //try to set color to band color if there is one
             //other wise use default color
@@ -152,14 +151,14 @@ public class BandoriPlayCommand {
             if (hasType) {
                 bandoriSong = result.searchByType(songType);
                 loadBandoriSongCommand.loadBandoriSong(textChannel, bandoriSong, member, musicManager);
-                embedBuilder.addField("","[" + bandoriSong.getName() + "added to queue](" + bandoriSong.getWiki()+ ")", false);
+                embedBuilder.addField("","[" + bandoriSong.getName() + "](" + bandoriSong.getWiki()+ ")" + " added to queue", false);
             }
             //if song type was not requested
             else {
                 songs = result.getAllSongs();
                 bandoriSong = songs.get(0);
                 loadBandoriSongCommand.loadBandoriSong(textChannel, songs.get(0), member, musicManager);
-                embedBuilder.addField("","[" + bandoriSong.getName() + "added to queue](" + bandoriSong.getWiki()+ ")", false);
+                embedBuilder.addField("","[" + bandoriSong.getName() + "](" + bandoriSong.getWiki()+ ")" + " added to queue", false);
             }
         }
         //send embed message

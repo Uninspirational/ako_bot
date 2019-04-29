@@ -16,7 +16,6 @@ public class BandoriSongs {
 
     private Hashtable<String, BandoriCollection> hashtable = new Hashtable<>(500);
     private ArrayList<String> keys = new ArrayList<>();
-    private ArrayList<BandoriSong> collection;
 
     public void BandoriRefresh() {
         try {
@@ -27,6 +26,7 @@ public class BandoriSongs {
 //            aisort by name in ascending order
 //            display url and mediatype
 
+            ArrayList<BandoriSong> collection;
             String urlString = "https://bandori.fandom.com/api.php?action=query&format=json&list=allimages&indexpageids=1&rawcontinue=1&aisort=name&aidir=descending&aiprop=url%7Csize%7Cmediatype&aiminsize=1000000&ailimit=max";
             collection = new ArrayList<>();
             JsonArray allimages;
@@ -48,14 +48,18 @@ public class BandoriSongs {
                 try {
                     next = rootobj.getAsJsonObject("query-continue").getAsJsonObject("allimages");
                     //only add audio files to arraylist
+                    System.out.println("---------------------------------");
+                    System.out.println("Loading Bandori Songs From API");
                     for (i = 0; i < allimages.size(); i++) {
                         if (allimages.get(i).getAsJsonObject().getAsJsonPrimitive("mediatype").getAsString().equals("AUDIO")) {
                             url = allimages.get(i).getAsJsonObject().getAsJsonPrimitive("url").getAsString();
                             name = allimages.get(i).getAsJsonObject().getAsJsonPrimitive("title").getAsString();
-                            System.out.println("name: " + name);
+
+                            System.out.println(name);
                             collection.add(getBandoriSong(name, url));
                         }
                     }
+                    System.out.println("---------------------------------");
 
                     //stop at last song
 
@@ -72,10 +76,15 @@ public class BandoriSongs {
                 }
             } while (flag);
             //sort songs by alphabetical order and return as array
-            BandoriSong[] songs = insertionSort();
-
+            System.out.println("---------------------------------");
+            System.out.println("Sorting Bandori Songs");
+            BandoriSong[] songs = insertionSort(collection);
+            System.out.println("---------------------------------");
             //put songs in hashmap of collection objects
+            System.out.println("---------------------------------");
+            System.out.println("Storing Bandori Songs");
             hashCollection(songs);
+            System.out.println("---------------------------------");
         }
         catch (MalformedURLException e) {
             logger.debug("Malformed URL Exception: {}", e);
@@ -89,21 +98,26 @@ public class BandoriSongs {
      * get id of page based on song name
      * @param name name of song
      */
-    private int getPageId(String name) throws IOException{
-        //replace special characters
-        name = unicodeFixer(name);
+    private int getPageId(String name) throws IOException {
+        try {
+            //replace special characters
+            name = unicodeFixer(name);
 
-        //find page from api
-        String url = "https://bandori.fandom.com/api.php?action=query&prop=revisions&titles=" + name + "&format=json";
-        JsonObject jsonObject = getJsonObjectFromUrl(url);
-        JsonObject query = jsonObject.getAsJsonObject("query");
-        JsonObject pages = query.getAsJsonObject("pages");
+            //find page from api
+            String url = "https://bandori.fandom.com/api.php?action=query&prop=revisions&titles=" + name + "&format=json";
+            JsonObject jsonObject = getJsonObjectFromUrl(url);
+            JsonObject query = jsonObject.getAsJsonObject("query");
+            JsonObject pages = query.getAsJsonObject("pages");
 
-        //isolate the id from jsonobject and return as integer
-        String idString = pages.getAsJsonObject().toString();
-        idString = idString.substring(2);
-        idString = idString.substring(0, idString.indexOf("\""));
-        return Integer.parseInt(idString);
+            //isolate the id from jsonobject and return as integer
+            String idString = pages.getAsJsonObject().toString();
+            idString = idString.substring(2);
+            idString = idString.substring(0, idString.indexOf("\""));
+            return Integer.parseInt(idString);
+        }
+        catch (Exception e) {
+            return -1;
+        }
     }
 
     /**
@@ -131,12 +145,17 @@ public class BandoriSongs {
      * @param id id to article
      * @return title of article
      */
-    private String getTitle(int id) throws IOException{
+    private String getTitle(int id) throws IOException, NullPointerException{
         //get jsonobject from api and return title
-        JsonObject jsonObject = getJsonObjectFromUrl(articleUrl(id));
-        JsonObject temp = jsonObject.getAsJsonObject("items");
-        temp = temp.getAsJsonObject("" + id);
-        return temp.getAsJsonPrimitive("title").getAsString();
+        try {
+            JsonObject jsonObject = getJsonObjectFromUrl(articleUrl(id));
+            JsonObject temp = jsonObject.getAsJsonObject("items");
+            temp = temp.getAsJsonObject("" + id);
+            return temp.getAsJsonPrimitive("title").getAsString();
+        }
+        catch (Exception e) {
+            return "";
+        }
     }
 
     /**
@@ -144,31 +163,35 @@ public class BandoriSongs {
      * @param id id to article
      * @return description of song
      */
-    private String getDescription(int id) throws IOException{
+    private String getDescription(int id) throws IOException, NullPointerException{
         //make sure song has valid id
-        if (id == -1)
-            return "";
-        String description = "";
-        String url = "https://bandori.fandom.com/api/v1/Articles/AsSimpleJson?id=" + id;
-        JsonObject jsonObject = getJsonObjectFromUrl(url);
-        JsonArray jsonArray = jsonObject.getAsJsonArray("sections");
-        JsonObject temp = jsonArray.get(0).getAsJsonObject();
-        jsonArray = temp.getAsJsonArray("content");
-        JsonPrimitive jsonPrimitive;
-        String line;
-        for (int i = 0; i < jsonArray.size(); i++) {
-            temp = jsonArray.get(i).getAsJsonObject();
-            jsonPrimitive = temp.getAsJsonPrimitive("text");
-            if (jsonPrimitive != null) {
-                line = jsonPrimitive.getAsString();
-                description = description.concat(line).concat(" ");
+        try {
+            if (id == -1)
+                return "";
+            String description = "";
+            String url = "https://bandori.fandom.com/api/v1/Articles/AsSimpleJson?id=" + id;
+            JsonObject jsonObject = getJsonObjectFromUrl(url);
+            JsonArray jsonArray = jsonObject.getAsJsonArray("sections");
+            JsonObject temp = jsonArray.get(0).getAsJsonObject();
+            jsonArray = temp.getAsJsonArray("content");
+            JsonPrimitive jsonPrimitive;
+            String line;
+            for (int i = 0; i < jsonArray.size(); i++) {
+                temp = jsonArray.get(i).getAsJsonObject();
+                jsonPrimitive = temp.getAsJsonPrimitive("text");
+                if (jsonPrimitive != null) {
+                    line = jsonPrimitive.getAsString();
+                    description = description.concat(line).concat(" ");
+                } else {
+                    //if the page has been moved to a different page
+                    return redirectSolver(url);
+                }
             }
-            else {
-                //if the page has been moved to a different page
-                return redirectSolver(url);
-            }
+            return description;
         }
-        return description;
+        catch (Exception e) {
+            return "";
+        }
     }
 
     /**
@@ -176,19 +199,24 @@ public class BandoriSongs {
      * @param url url to old wiki page
      * @return url to new wiki page
      */
-    private String redirectSolver(String url) throws IOException{
-        String description, line;
-        JsonObject jsonObject = getJsonObjectFromUrl(url);
-        JsonArray jsonArray = jsonObject.getAsJsonArray("sections");
-        jsonObject = jsonArray.get(0).getAsJsonObject();
-        jsonArray = jsonObject.getAsJsonArray("content");
-        jsonArray = jsonArray.get(0).getAsJsonObject().getAsJsonArray("elements");
-        jsonObject = jsonArray.get(0).getAsJsonObject();
-        line = jsonObject.getAsJsonPrimitive("text").getAsString();
-        line = line.substring(line.indexOf(" ") + 1);
-        line = line.replace(" ", "_");
-        description = getDescription(getPageId(line));
-        return description;
+    private String redirectSolver(String url) throws IOException, NullPointerException {
+        try {
+            String description, line;
+            JsonObject jsonObject = getJsonObjectFromUrl(url);
+            JsonArray jsonArray = jsonObject.getAsJsonArray("sections");
+            jsonObject = jsonArray.get(0).getAsJsonObject();
+            jsonArray = jsonObject.getAsJsonArray("content");
+            jsonArray = jsonArray.get(0).getAsJsonObject().getAsJsonArray("elements");
+            jsonObject = jsonArray.get(0).getAsJsonObject();
+            line = jsonObject.getAsJsonPrimitive("text").getAsString();
+            line = line.substring(line.indexOf(" ") + 1);
+            line = line.replace(" ", "_");
+            description = getDescription(getPageId(line));
+            return description;
+        }
+        catch (Exception e) {
+            return "";
+        }
     }
 
     /**
@@ -197,7 +225,7 @@ public class BandoriSongs {
      * @return url to thumbnail of song
      */
 
-    private String getThumbnail(int id) throws IOException{
+    private String getThumbnail(int id) {
         try {
             String url = articleUrl(id);
             JsonObject jsonObject = getJsonObjectFromUrl(url);
@@ -205,10 +233,7 @@ public class BandoriSongs {
             temp = temp.getAsJsonObject("" + id);
             return temp.getAsJsonPrimitive("thumbnail").getAsString();
         }
-        catch (ClassCastException e) {
-            return "";
-        }
-        catch (NullPointerException f) {
+        catch (Exception f) {
             return "";
         }
     }
@@ -357,6 +382,9 @@ public class BandoriSongs {
         else if (name.contains("STAR BEAT ")) {
             name = name.replace("STAR BEAT ", "STAR BEAT! ");
         }
+        else if (name.contains("Hanazono Electric Guitar!!!")) {
+            name = name.replace("Hanazono Electric Guitar!!!", "Hanazono Denki Guitar!!!");
+        }
         return name;
     }
     /**
@@ -368,17 +396,22 @@ public class BandoriSongs {
     private BandoriSong getBandoriSong(String name, String url) throws IOException {
         String title;
         name = nameSplitter(nameCorrecter(name));
-        int id = getPageId(name);
         SongType songType = getSongType(name);
-        //if song is not the game version, use the title as is
-        if (id == -1) {
-            title = name;
+        try {
+            int id = getPageId(name);
+            //if song is not the game version, use the title as is
+            if (id == -1) {
+                title = name;
+            }
+            //if song is the game version, get the proper title
+            else {
+                title = getTitle(id);
+            }
+            return new BandoriSong(title, url, null, id, songType);
         }
-        //if song is the game version, get the proper title
-        else {
-            title = getTitle(id);
+        catch (Exception e) {
+            return new BandoriSong(name, url, null, -1, songType);
         }
-        return new BandoriSong(title, url, null, id, songType);
     }
 
     /**
@@ -394,10 +427,12 @@ public class BandoriSongs {
      * insert sort all the bandori songs
      * @return returns songs as an array
      */
-    private BandoriSong[] insertionSort() {
+    private BandoriSong[] insertionSort(ArrayList<BandoriSong> collection) {
         int i, j, length = collection.size();
-        if (length == 0)
+        if (length == 0) {
             logger.debug("collection is empty could not sort bandorisongs");
+            throw new NullPointerException("empty collection in insertsort bandoriSongs");
+        }
         BandoriSong[] songs = new BandoriSong[length];
         BandoriSong pos;
 
@@ -424,36 +459,57 @@ public class BandoriSongs {
      * @param description song description from getDescription()
      * @return array of band names
      */
-    private String[] bandNames(String description) {
-        int i = 0;
-        String[] names = new String[7];
-        description = description.toLowerCase();
-        if (description.contains("roselia")) {
-            names[i++] = "Roselia";
-        }
-        if (description.contains("poppin")) {
-            names[i++] = "Poppin'Party";
-        }
-        if (description.contains("afterglow")) {
-            names[i++] = "afterglow";
-        }
-        if (description.contains("pastel")) {
-            names[i++] = "Pastel☆Palettes";
-        }
-        if (description.contains("hello, happy world")) {
-            names[i++] = "Hello, Happy World";
-        }
-        if (description.contains("glitter")) {
-            names[i++] = "Glitter☆Green";
-        }
-        if (description.contains("raise a suilen")) {
-            names[i++] = "RAISE A SUILEN";
-        }
-        if (description.contains("argonavis")) {
-            names[i] = "Argonavis";
-        }
+    private BandType[] bandNames(String description) {
+        try {
+            int i = 0;
+            BandType[] bandTypes = new BandType[15];
+            description = description.toLowerCase().substring(0, description.indexOf(". "));
+            if (description.contains("god knows"))
+                bandTypes[i++] = BandType.POPIPA;
+            if (description.contains("tsunagu, soramoyou"))
+                bandTypes[i++] = BandType.AFTERGLOW;
+            if (description.contains("high school part time workers")) {
+                bandTypes[i++] = BandType.HSPTW;
+            }
+            if (description.contains("roselia")) {
+                bandTypes[i++] = BandType.ROSELIA;
+            }
+            if (description.contains("poppin")) {
+                bandTypes[i++] = BandType.POPIPA;
+            }
+            if (description.contains("afterglow")) {
+                bandTypes[i++] = BandType.AFTERGLOW;
+            }
+            if (description.contains("pastel")) {
+                bandTypes[i++] = BandType.PASUPARE;
+            }
+            if (description.contains("hello, happy world")) {
+                bandTypes[i++] = BandType.HELLOHAPPY;
+            }
+            if (description.contains("glitter")) {
+                bandTypes[i++] = BandType.GURIGURI;
+            }
+            if (description.contains("raise a suilen")) {
+                bandTypes[i++] = BandType.RAS;
+            }
+            if (description.contains("gfriend")) {
+                bandTypes[i++] = BandType.GFRIEND;
+            }
+            if (description.contains("chispa")) {
+                bandTypes[i++] = BandType.CHISPA;
+            }
+            if (description.contains("character song") && !description.contains("god knows...")) {
+                bandTypes[i++] = BandType.CHARACTERSONG;
+            }
+            if (description.contains("argonavis")) {
+                bandTypes[i] = BandType.ARGONAVIS;
+            }
 
-        return names;
+            return bandTypes;
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -464,11 +520,12 @@ public class BandoriSongs {
         int length = array.length;
         int i, id;
         String name, wikiUrl, thumbnail, key, hashName, description;
-        String[] bands;
+        BandType[] bands;
         BandoriSong song;
         try {
             //first run through to create collections for all game version songs
             for (i = 0; i < length; i++) {
+                System.out.println(array[i].getName());
                 if (array[i].getSongType().equals(SongType.GAME_VERSION)) {
                     song = array[i];
                     //strip names of uniqueness to turn into hash code
@@ -483,9 +540,10 @@ public class BandoriSongs {
                     description = getDescription(id);
                     bands = bandNames(description);
                     //create collection, add song, and add it to hashtable
-                    BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail, key);
+                    BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail);
                     song.setBand(collection.getBand());
                     song.setWiki(wikiUrl);
+                    song.setThumbnail(thumbnail);
                     collection.addSong(song);
                     this.hashtable.put(key, collection);
                     this.keys.add(key);
@@ -504,6 +562,7 @@ public class BandoriSongs {
                         song = array[i];
                         song.setBand(hashtable.get(key).getBand());
                         song.setWiki(hashtable.get(key).getWikiUrl());
+                        song.setThumbnail(hashtable.get(key).getThumbNail());
                         hashtable.get(key).addSong(song);
                     }
                     //if the song does not have a game version
@@ -521,9 +580,10 @@ public class BandoriSongs {
                         description = getDescription(id);
                         bands = bandNames(description);
                         //create collection
-                        BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail, key);
+                        BandoriCollection collection = new BandoriCollection(name, wikiUrl, description, bands, thumbnail);
                         song.setBand(collection.getBand());
                         song.setWiki(wikiUrl);
+                        song.setThumbnail(thumbnail);
                         collection.addSong(song);
                         hashtable.put(key, collection);
                         this.keys.add(key);
@@ -533,7 +593,7 @@ public class BandoriSongs {
             }
         }
         catch (IOException e) {
-            logger.debug("" + e);
+            logger.debug("Could not store bandori songs {}" + e);
         }
     }
 
@@ -543,7 +603,7 @@ public class BandoriSongs {
      * @param string string to edit
      * @return alphanumeric string with no spaces
      */
-    public String removeSpecial(String string) {
+    String removeSpecial(String string) {
         string = string.replace("-", "");
         string = string.replace(" ", "");
         string = string.replace("_", "");
@@ -654,11 +714,10 @@ public class BandoriSongs {
             jsonObject = jsonObject.getAsJsonObject("items");
             JsonPrimitive jsonPrimitive = jsonObject.getAsJsonObject(id + "").getAsJsonPrimitive("title");
             return jsonPrimitive.getAsString();
-        } catch (IOException e) {
-            logger.debug("couldn't get article name", e);
+        }
+        catch (Exception e) {
             return "";
         }
-
     }
 
     /**
@@ -675,14 +734,6 @@ public class BandoriSongs {
      */
     public Hashtable<String, BandoriCollection> getHashTable() {
         return hashtable;
-    }
-
-    /**
-     *
-     * @return arraylist of bandori songs
-     */
-    public ArrayList<BandoriSong> getCollection() {
-        return collection;
     }
 
     /**

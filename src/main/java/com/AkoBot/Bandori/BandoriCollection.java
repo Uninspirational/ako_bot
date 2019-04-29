@@ -1,39 +1,37 @@
 package com.AkoBot.Bandori;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class BandoriCollection {
     private LinkedList<BandoriSong> bandoriSongs;
     private String name;
-    private String[] band;
+    private BandType[] band;
     private String wikiUrl;
     private int length = 0;
     private String thumbNail;
-    private String key;
     private String description;
-    public BandoriCollection(String name, String wikiUrl, String description, String[] band, String thumbNail, String key) {
+    BandoriCollection(String name, String wikiUrl, String description, BandType[] band, String thumbNail) {
         this.name = name;
         this.wikiUrl = wikiUrl;
         this.bandoriSongs = new LinkedList<>();
         this.thumbNail = thumbNail;
-        this.key = key;
         this.description = description;
         this.band = band;
     }
+    public BandoriSong getFirstSong() { return this.bandoriSongs.get(0); }
 
     public void setName(String name) {
         this.name = name;
     }
-
+    @SuppressWarnings("unused")
     public void setThumbNail(String thumbNail) {
         this.thumbNail = thumbNail;
     }
-
+    @SuppressWarnings("unused")
     public void setWikiUrl(String wikiUrl) {
         this.wikiUrl = wikiUrl;
     }
-
+    @SuppressWarnings("unused")
     public void setDescription(String description) {
         this.description = description;
     }
@@ -42,11 +40,11 @@ public class BandoriCollection {
         return this.description;
     }
 
-    public void setBand(String[] band) {
+    public void setBand(BandType[] band) {
         this.band = band;
     }
 
-    public void addSong(BandoriSong bandoriSong) {
+    void addSong(BandoriSong bandoriSong) {
         this.length++;
         this.bandoriSongs.add(bandoriSong);
     }
@@ -54,7 +52,7 @@ public class BandoriCollection {
     public LinkedList<BandoriSong> getAllSongs() {
         return this.bandoriSongs;
     }
-
+    @SuppressWarnings("unused")
     public BandoriSong searchByType(String type) {
         SongType songType = null;
         type = type.toLowerCase();
@@ -121,10 +119,11 @@ public class BandoriCollection {
     public String getBand() {
         int i = 0;
         String result = "";
+        BandoriTypes bandoriTypes = new BandoriTypes();
         while (this.band != null && this.band[i] != null) {
             if (i != 0)
                 result = result.concat(", ");
-            result = result.concat(this.band[i++]);
+            result = result.concat(bandoriTypes.getBandString(this.band[i++]));
         }
         return result;
     }

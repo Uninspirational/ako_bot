@@ -17,13 +17,18 @@ public class MusicQueueCommand {
         int counter = 0;
         long length = 0;
         Queue<Song> tracks = musicManager.getPlayer(guild).getListener().getTracks();
+        if (tracks.isEmpty()) {
+            textChannel.sendMessage("Queue is empty!").queue();
+            return;
+        }
         Object[] queue = tracks.toArray();
         Song songGetter;
+
         if (queue[0] instanceof Song) {
             songGetter = (Song) queue[0];
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder.setDescription("This song is the coolest <3");
-            while (counter < queue.length && counter < 11) {
+            while (counter < queue.length && counter < 10) {
                 songGetter = (Song) queue[counter];
                 counter++;
                 if (songGetter.getBandoriSong() == null) {
@@ -33,7 +38,7 @@ public class MusicQueueCommand {
                 }
                 else {
                     title = "Requested by " + songGetter.getMember().getEffectiveName();
-                    field = "[" + counter + "] - " + "[" + songGetter.getBandoriSong().getName() + "](" + songGetter.getBandoriSong().getUrl() + ") by *" + songGetter.getBandoriSong().getBand() + "*";
+                    field = "[" + counter + "] - " + "[" + songGetter.getBandoriSong().getName() + "](" + songGetter.getBandoriSong().getWiki() + ") by *" + (songGetter.getBandoriSong().getBand().equals("") ? "Poppin'Party" : songGetter.getBandoriSong().getBand())+ "*";
                     embedBuilder.addField(title, field, false);
                 }
             }

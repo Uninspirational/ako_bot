@@ -15,9 +15,12 @@ public class MinecraftInfoCommand {
                 .setTitle("Minecraft Server Information")
                 .setThumbnail("https://gamepedia.cursecdn.com/minecraft_gamepedia/c/c7/Grass_Block.png?version=08c50447b4f0c1f9c1792a8b833e3b78")
                 .setColor(new Color(0x5b8731))
-                .setDescription("All servers have the port 25565, and only can be open at a time\nUse $startminecraft <server name> to start a server");
-        if (minecraftServer.isRunning()) {
-            embedBuilder.addField("A server is currently running", minecraftServer.getServername(), false);
+                .setDescription("All servers have the port 25565, and only one can be open at a time\nUse $startminecraft <server name> to start a server");
+        if (minecraftServer == null) {
+            embedBuilder.addField("No server is currently running, ", "", false);
+        }
+        else if (minecraftServer.isRunning()) {
+            embedBuilder.addField("This server is currently running: ", minecraftServer.getServername(), false);
         }
         else {
             embedBuilder.addField("No server is currently running", "", false);

@@ -39,6 +39,12 @@ public class MusicNowPlayingCommand {
 
             }
             EmbedBuilder response = new EmbedBuilder();
+            try {
+                response.setThumbnail(np.getBandoriSong().getThumbnail());
+            }
+            catch (IllegalArgumentException z) {
+                response.setThumbnail("https://vignette.wikia.nocookie.net/bandori/images/8/84/Ako_PICO_Icon.png/revision/latest?cb=20180715113757");
+            }
             response.setTitle(title, url).setColor(new java.awt.Color(0xBA00BA));
             response.setDescription("*by " + author + "*").setAuthor("Now Singing <3 ~~~");
             response.setFooter(millisecondConverter.millisecondConverter(position) + " / " + millisecondConverter.millisecondConverter(length), null);

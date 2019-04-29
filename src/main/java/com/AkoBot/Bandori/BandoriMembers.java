@@ -1,6 +1,5 @@
 package com.AkoBot.Bandori;
 
-import com.AkoBot.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,14 +14,13 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
 public class BandoriMembers {
-    private ArrayList<JsonObject> bandoriMembers;
-    final org.slf4j.Logger logger = LoggerFactory.getLogger(BandoriMembers.class);
+    private ArrayList<BandoriMember> bandoriMembers;
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(BandoriMembers.class);
 
     public void bandoriRefresh(MessageReceivedEvent messageReceivedEvent) {
         try {
@@ -39,8 +37,9 @@ public class BandoriMembers {
                 JsonElement jsonElement = jsonParser.parse(inputStreamReader);
                 JsonObject rootobj = jsonElement.getAsJsonObject();
                 page = rootobj.getAsJsonArray("results");
-                while (i < page.size())
-                    bandoriMembers.add(page.get(i++).getAsJsonObject());
+                while (i < page.size()) {
+                    bandoriMembers.add(new BandoriMember(page.get(i++).getAsJsonObject()));
+                }
                 i = 0;
                 urlString = rootobj.get("next").toString();
                 if (urlString.equals("null"))
@@ -53,7 +52,7 @@ public class BandoriMembers {
             messageReceivedEvent.getTextChannel().sendMessage("Done!").queue();
         }
         catch (IOException f) {
-            new Logger().logError(f);
+            logger.debug("" + f);
         }
     }
     public void controller(MessageReceivedEvent messageReceivedEvent) {
@@ -98,10 +97,12 @@ public class BandoriMembers {
                     searchForMember(textChannel, keyterm, "CV");
                     break;
                 case "foodlike":
+                case "fl":
                     searchForMember(textChannel, keyterm, "food_like");
                     break;
                 case "fooddislike":
                 case "foodhate":
+                case "fd":
                     searchForMember(textChannel, keyterm, "food_dislike");
                     break;
                 case "sign":
@@ -119,73 +120,36 @@ public class BandoriMembers {
             textChannel.sendMessage("You recite the spell like this: $member <category> <search term>").queue();
         }
     }
-    public void searchForMember(TextChannel textChannel, String keyterm, String category) {
-        boolean exist = false;
-        boolean multiple = false;
-        String name;
-        JsonObject[] result = new JsonObject[25];
-        int j = 0;
-        for (JsonObject finder: bandoriMembers) {
-            finder = finder.getAsJsonObject();
-            name = finder.get(category).toString().toLowerCase();
-            if (name.contains(keyterm)) {
-                result[j++] = finder;
-                if (exist)
-                    multiple = true;
-                exist = true;
+    private void searchForMember(TextChannel textChannel, String keyterm, String category) {
+        ArrayList<BandoriMember> result = new ArrayList<>();
+        for (BandoriMember bandoriMember: bandoriMembers) {
+            if (bandoriMember.search(category, keyterm)) {
+                result.add(bandoriMember);
             }
         }
-        if (multiple)
+        if (result.size() > 1)
             multipleResultPrinter(textChannel, result, category, keyterm);
-        else if (exist)
-            cardPrinter(textChannel, result[0]);
+        else if (result.size() == 1) {
+            cardPrinter(textChannel, result.get(0));
+        }
+        else {
+            textChannel.sendMessage("No members found").queue();
+        }
     }
-    public String cutter(JsonElement jsonElement) {
-        return jsonElement.toString().substring(1, jsonElement.toString().length() - 1);
-    }
-    public void cardPrinter(TextChannel textChannel, JsonObject jsonObject) {
-        int id = jsonObject.get("id").getAsInt();
-        String name = cutter(jsonObject.get("name"));
-        String japanese_name = cutter(jsonObject.get("japanese_name"));
-        String image = cutter(jsonObject.get("image"));
-        String square_image = cutter(jsonObject.get("square_image"));
-        String i_band = cutter(jsonObject.get("i_band"));
-        String school = cutter(jsonObject.get("school"));
-        String i_school_year = cutter(jsonObject.get("i_school_year"));
-        String romaji_CV = cutter(jsonObject.get("romaji_CV"));
-        String CV = cutter(jsonObject.get("CV"));
-        String birthday = cutter(jsonObject.get("birthday"));
-        String food_like = cutter(jsonObject.get("food_like"));
-        String food_dislike = cutter(jsonObject.get("food_dislike"));
-        String i_astrological_sign = cutter(jsonObject.get("i_astrological_sign"));
-        String instrument = cutter(jsonObject.get("instrument"));
-        String description = cutter(jsonObject.get("description"));
-        EmbedBuilder embedBuilder =
-                new EmbedBuilder()
-                        .setTitle("**" + name + "**" + "\n" + japanese_name)
-                        .setDescription(i_school_year + " year " + "at **" + school + "**\n" + "*" + description + "*")
-                        .setColor(new Color(0xBA00BA))
-                        .setThumbnail(square_image)
-                        .setImage(image)
-                        .addField(instrument, "", false)
-                        .setAuthor(i_band, null, bandIcon(i_band))
-                        .addField("Voice Actor", romaji_CV + "\n" + CV, false)
-                        .addField("Favorite foods", food_like, true)
-                        .addField("Least favorite foods", food_dislike, true)
-                        .addField("Birthday", birthday, true)
-                        .addField("Astrological sign", i_astrological_sign, true);
+    private void cardPrinter(TextChannel textChannel, BandoriMember bandoriMember) {
+        EmbedBuilder embedBuilder = bandoriMember.getEmbedMessage();
         MessageBuilder messageBuilder = new MessageBuilder()
                 .setEmbed(embedBuilder.build());
-        textChannel.sendMessage("Member ID: " + id + messageBuilder.build()).queue();
+        textChannel.sendMessage(messageBuilder.build()).queue();
     }
-    public void multipleResultPrinter(TextChannel textChannel, JsonObject[] jsonObjects, String category, String keyterm) {
+    private void multipleResultPrinter(TextChannel textChannel, ArrayList<BandoriMember> arrayList, String category, String keyterm) {
         String list = "";
         int i = 0;
-        while (jsonObjects[i] != null){
+        while (i < 25 && i < arrayList.size()){
             if (!(category.equals("food_like") || category.equals("food_dislike") || category.equals("name"))) {
                 list = list.concat(category + " - ");
             }
-            list = list.concat(cutter(jsonObjects[i].get("name")));
+            list = list.concat(arrayList.get(i).getName());
             list = list.concat("\n");
             i++;
         }
@@ -199,26 +163,15 @@ public class BandoriMembers {
                 .setEmbed(embedBuilder.build());
         textChannel.sendMessage(messageBuilder.build()).queue();
     }
-    public String bandIcon(String bandname) {
-        switch (bandname) {
-            case ("Poppin'Party") :
-                return "https://vignette.wikia.nocookie.net/bandori/images/1/1f/PoPiPa_icon.png/revision/latest?cb=20180522125930";
-            case ("Hello, Happy World!") :
-                return "https://vignette.wikia.nocookie.net/bandori/images/5/52/HaroHapi_icon.png/revision/latest?cb=20180522125928";
-            case ("Afterglow") :
-                return "https://vignette.wikia.nocookie.net/bandori/images/0/01/Afterglow_icon.png/revision/latest?cb=20180522125931";
-            case ("Roselia") :
-                return "https://vignette.wikia.nocookie.net/bandori/images/d/db/Roselia_icon.png/revision/latest?cb=20180522125933";
-            case ("Pastel*Palettes") :
-                return "https://vignette.wikia.nocookie.net/bandori/images/0/0b/PasuPare_icon.png/revision/latest?cb=20180522125926";
-            default:
-                return "";
+    String searchById(int id) {
+        return bandoriMembers.get(id - 6).getName();
+    }
+    BandoriMember getMemberById(int id) {
+        for (BandoriMember bandoriMember : this.bandoriMembers) {
+            if (bandoriMember.getId() == id) {
+                return bandoriMember;
+            }
         }
-    }
-    public String bandIcon(int id) {
-        return bandIcon(cutter(bandoriMembers.get((id - 6)).get("i_band")));
-    }
-    public String searchById(int id) {
-        return cutter(bandoriMembers.get(id - 6).get("name"));
+        return null;
     }
 }
