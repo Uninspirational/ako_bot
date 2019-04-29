@@ -96,4 +96,5 @@ public class BandoriGameTurn {
     public int getLoser() {
         return loser;
     }
+
 }

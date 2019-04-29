@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class BandoriTeam {
@@ -19,6 +20,7 @@ public class BandoriTeam {
     private int size;
     public BandoriTeam() {
         this.team = new ArrayList<>();
+        this.gameTeam = new ArrayList<>();
         this.size = 0;
     }
     public void addCardToTeam(MessageReceivedEvent messageReceivedEvent, ArrayList<BandoriCard> cards, EventWaiter waiter) {
@@ -54,6 +56,19 @@ public class BandoriTeam {
         embedBuilder.addField("Your current band", currentTeam.toString(), false);
         textChannel.sendMessage(embedBuilder.build()).queue();
     }
+    public void shuffleToGameTeam() {
+        Random r = new Random();
+        r.setSeed(System.currentTimeMillis());
+        ArrayList<BandoriCard> temp = this.team;
+        for (int i = 0; i < temp.size(); i++) {
+            gameTeam.add(temp.remove(r.nextInt(temp.size())));
+        }
+    }
+
+    public ArrayList<BandoriCard> getGameTeam() {
+        return gameTeam;
+    }
+
     private BandoriCard[] getAsArray() {
         BandoriCard[] array = new BandoriCard[5];
         for (int i = 0; i < 5; i++) {
@@ -155,6 +170,13 @@ public class BandoriTeam {
     public String getString() {
         StringBuilder string = new StringBuilder();
         for (BandoriCard card : this.getTeam()) {
+            string.append(card.getCardDescription()).append("\n");
+        }
+        return string.toString();
+    }
+    public String getGameString() {
+        StringBuilder string = new StringBuilder();
+        for (BandoriCard card : this.gameTeam) {
             string.append(card.getCardDescription()).append("\n");
         }
         return string.toString();

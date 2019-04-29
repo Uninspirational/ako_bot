@@ -8,11 +8,13 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Profile {
     private String userId;
     private ArrayList<BandoriCard> cards = null;
     private BandoriTeam team;
+    private ArrayList<BandoriCard> gameTeam;
 
     public Profile(String userId, BandoriCards bandoriCards) {
         this.cards = new ArrayList<>();
@@ -78,12 +80,14 @@ public class Profile {
         }
     }
 
+    public void shuffleTeam() {
+        this.team.shuffleToGameTeam();
+        this.gameTeam = team.getGameTeam();
+    }
 
-
-
-
-
-
+    public ArrayList<BandoriCard> getGameTeam() {
+        return gameTeam;
+    }
 
     public void saveProfile() {
         try {
@@ -144,7 +148,7 @@ public class Profile {
         return this.userId;
     }
 
-
+    public String getMention() { return "<@!" + this.userId + ">"; }
 
 
 
