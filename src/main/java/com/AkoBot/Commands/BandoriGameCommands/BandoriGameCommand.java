@@ -81,35 +81,42 @@ public class BandoriGameCommand {
                 channel.sendMessage(embedBuilder.build()).queue());
         BandoriGameTurn turn = new BandoriGameTurn(profile1.getTeam(), profile2.getTeam());
 
-        recursivePrompt1(textChannel, profile1, profile2, waiter, turn);
+        //turn 1
+        recursivePrompt1(textChannel, profile1, profile2, member1, member2, waiter, turn);
         printResults(textChannel, profile1, profile2, turn);
 
-        recursivePrompt1(textChannel, profile1, profile2, waiter, turn);
+        //turn 2
+        recursivePrompt1(textChannel, profile1, profile2, member1, member2, waiter, turn);
         printResults(textChannel, profile1, profile2, turn);
 
-        recursivePrompt1(textChannel, profile1, profile2, waiter, turn);
+        //turn 3
+        recursivePrompt1(textChannel, profile1, profile2, member1, member2, waiter, turn);
         printResults(textChannel, profile1, profile2, turn);
 
-        recursivePrompt1(textChannel, profile1, profile2, waiter, turn);
+        //turn 4
+        recursivePrompt1(textChannel, profile1, profile2, member1, member2, waiter, turn);
         printResults(textChannel, profile1, profile2, turn);
 
-        recursivePrompt1(textChannel, profile1, profile2, waiter, turn);
+        //turn 5
+        recursivePrompt1(textChannel, profile1, profile2, member1, member2, waiter, turn);
         printResults(textChannel, profile1, profile2, turn);
 
-
-        textChannel.sendMessage("end of code, still WIP").queue();
-
+        printFinalResults(textChannel, profile1, profile2, turn);
     }
-    private void recursivePrompt1(TextChannel textChannel, Profile profile1, Profile profile2, EventWaiter waiter, BandoriGameTurn turn) {
+    private void recursivePrompt1(TextChannel textChannel, Profile profile1, Profile profile2, Member member1, Member member2, EventWaiter waiter, BandoriGameTurn turn) {
         textChannel.sendMessage(profile1.getMention() + " please enter the number of the card you would like to use!").queue();
+        EmbedBuilder embedBuilder = new EmbedBuilder().addField("Your cards:", profile1.getTeam().getGameString(), false)
+                .addField("Please enter the card you would like to use in the channel the challenge was sent!", "", false);
+        member1.getUser().openPrivateChannel().queue((channel) ->
+                channel.sendMessage(embedBuilder.build()).queue());
         waiter.waitForEvent(GuildMessageReceivedEvent.class, e -> e.getAuthor().getId().equals(profile1.getUserId()) && e.getChannel().equals(textChannel), e -> {
                     try{
                         int number1 = Integer.parseInt(e.getMessage().getContentStripped());
-                        recursivePrompt2(textChannel, profile1, profile2, waiter, turn, number1);
+                        recursivePrompt2(textChannel, profile2, member2, waiter, turn, number1);
                     }
                     catch (NumberFormatException h) {
                         textChannel.sendMessage("Please enter a valid number!").queue();
-                        recursivePrompt1(textChannel, profile1, profile2, waiter, turn);
+                        recursivePrompt1(textChannel, profile1, profile2, member1, member2, waiter, turn);
                     }
 
                 }, 120, TimeUnit.SECONDS, () ->
@@ -118,8 +125,12 @@ public class BandoriGameCommand {
 
 
     }
-    private void recursivePrompt2(TextChannel textChannel, Profile profile1, Profile profile2, EventWaiter waiter, BandoriGameTurn turn, int number1) {
+    private void recursivePrompt2(TextChannel textChannel, Profile profile2, Member member2, EventWaiter waiter, BandoriGameTurn turn, int number1) {
         textChannel.sendMessage(profile2.getMention() + " please enter the number of the card you would like to use!").queue();
+        EmbedBuilder embedBuilder = new EmbedBuilder().addField("Your cards:", profile2.getTeam().getGameString(), false)
+                .addField("Please enter the card you would like to use in the channel the challenge was sent!", "", false);
+        member2.getUser().openPrivateChannel().queue((channel) ->
+                channel.sendMessage(embedBuilder.build()).queue());
         waiter.waitForEvent(GuildMessageReceivedEvent.class, g -> g.getAuthor().getId().equals(profile2.getUserId()) && g.getChannel().equals(textChannel), g -> {
                     try{
                         int number2 = Integer.parseInt(g.getMessage().getContentStripped());
@@ -127,7 +138,7 @@ public class BandoriGameCommand {
                     }
                     catch (NumberFormatException f) {
                         textChannel.sendMessage("Please enter a valid number!").queue();
-                        recursivePrompt2(textChannel, profile1, profile2, waiter, turn, number1);
+                        recursivePrompt2(textChannel, profile2, member2, waiter, turn, number1);
                     }
 
                 }, 120, TimeUnit.SECONDS, () ->
