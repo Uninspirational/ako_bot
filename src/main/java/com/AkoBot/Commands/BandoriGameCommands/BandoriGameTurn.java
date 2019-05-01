@@ -76,6 +76,7 @@ public class BandoriGameTurn {
         //TODO
         //add skill bonuses
 
+
         this.message += "Performance: " + performance1 + "\t\t" + "Performance: " + performance2 + "\n";
         this.message += "Technique: " + technique1 + "\t\t" + "Technique: " + technique2 + "\n";
         this.message += "Visual: " + visual1 + "\t\t" + "Visual: " + visual2 + "\n";
